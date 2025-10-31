@@ -114,35 +114,6 @@
 
 \begin{abstract}[spanish]
 
-\end{abstract}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                             %
-%                              CONTENIDO DEL TREBAJO                          %
-%                                                                             %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                  ÍDNICE                                     %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\clearpage
-\tableofcontents
-% \listoffigures
-% \listoftables
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                GLOSARIO                                     %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \glsaddall
-% \printglossaries
-% \printnoidxglossaries
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                  INTRODUCCION                               %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Introducción}
-
 \begin{lstlisting}[language=Python, basicstyle=\ttfamily\small, frame=single, numbers=left, breaklines=true]
 def generate_prompt(df_train: pd.DataFrame, df_batch: pd.DataFrame, genres: str) -> str:
     prompt = f"""
@@ -172,27 +143,120 @@ def generate_prompt(df_train: pd.DataFrame, df_batch: pd.DataFrame, genres: str)
 \end{lstlisting}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                             %
+%                              CONTENIDO DEL TREBAJO                          %
+%                                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                  ÍDNICE                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
+\tableofcontents
+% \listoffigures
+% \listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                GLOSARIO                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% \glsaddall
+% \printglossaries
+% \printnoidxglossaries
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                  INTRODUCCION                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Introducción}
+
+\section{Problema a resolver}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                         ANÁLISIS DEL PROBLEMA                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mainmatter
 \chapter{Codificación}
+En este apartado se habla de como se han codificado los individuos para abordar el problema. Recordar que el objetivo es encontrar, para un set de piezas concreto, la posición y orientación óptima de cada pieza para minimizar el espacio ocupado. A eso hay que añadirle dos reglas del juego: al completar una línea esta se limpia, y las piezas no pueden estar flotando al colocarse.
 
-\section{Tecnologías}
+Con esto, se parte de la idea de 'jugar' al Tetris. La propuesta tras esta premisa no es jugar al juego de verdad, sino conseguir una codificación que permita cumplir las restricciones impuestas, y conseguir soluciones que minimicen el espacio ocupado sin necesidad de descartar individuos inválidos. 
 
-\subsection{Modelos clásicos}
+La forma de atacar este problema de cobertura, será definiendo una serie de movimiento posibles. Con ellos, se codifica la posición final de cada pieza como una secuencia de estos. Así pues, cada genotipo será una secuencia de movimientos tras otros, de forma que si hay $x$ moviemientos válidos y se disponone de $n$ piezas, la codificación del genotipo será una secuencia $x \times n$ movimientos.
 
-\subsection{Transformers}
+Al codificar los genotipos de esta forma, los individuos resultantes serán siempre válidos, ya que cada pieza se colocará en el tablero siguiendo las reglas del juego. Esto implica también que deberemos ser capaces de simular el juego para poder evaluar cada individuo, ya que la fenotipo de cada individuo será el estado final del tablero tras colocar todas las piezas siguiendo los movimientos indicados en el genotipo. 
 
-\subsection{LLMs (Grandes Modelos de lenguaje)}
+También, habrá movimiento que resulten en '\textit{no-op}', como intentar mover una pieza a la izquierda cuando ya está en el borde izquierdo del tablero. Más abajo vemos como se gestionan estos casos.
 
-\section{Dataset}
+\section{Movimientos posibles}
+Cuando decimos codificar los individuos como una secuencia de movimientos, es necesario definir qué podrán hacer estos. Si nos fijamos en el juego original, los movimientos posibles son:
 
-\section{Manejo del dataset}
+\begin{itemize}
+    \item Mover la pieza a la izquierda.
+    \item Mover la pieza a la derecha.
+    \item Rotar la pieza en el sentido de las agujas del reloj.
+    \item Dejar caer la pieza.
+    \item Bloquear la pieza.
+    \item Intercambiar la pieza actual por la siguiente (o por una ya cambiada anteriormente)
+\end{itemize}
 
-\subsection{Procesado del dataset}
+En el juego original cuando se dejaba caer una pieza y esta toca el suelo, se bloqueaba al instante. Sin embargo, en versiones más modernas, esto no es así y aún habiendo tocado el suelo se permite mover la pieza con unas ciertas reglas. En este casi estaríamos hablamos de un Tetris Tetris 99 \cite{}, donde se permite que las piezas se muevan con más libertad y por tanto, se da más capacidad de representación al jugador. Es por todo esto que elegimos usar esta versión del juego y no la clásica con el objetivo de dotar a los individuos de más capacidad de representación lo que potencialmente, debería permitirnos llegar a mejores soluciones.
 
-\section{Evaluación}
+Ahora, si se tiene algo de experiencia en el juego, se puede ver que no en todas las situaciones todos los movimientos son necesarios para llegar a una solución concrata. Sin ir más lejos, en casos donde el tablero está casi vacío y no hay piezas creando agujeros, siempre se podrá poner una pieza en cualquiera de las posiciones validas con una \textit{rotación} y un \textit{movimiento lateral}. 
+
+Como tampoco queremos eliminar de la experimentación la posibilidad de ver los efectos que tiene el sí hacer más movimientos una vez las piezas han tocado el suelo, se han configurado cuatro sets posibles de movimientos:
+\begin{itemize}
+
+    \item Simple.
+        \begin{enumerate}
+            \item Mover la pieza.
+            \item Rotar la pieza.
+        \end{enumerate}
+    \item Double.
+        \begin{enumerate}
+            \item Mover la pieza.
+            \item Rotar la pieza.
+            \item \textit{Dejar caer la pieza}
+            \item Mover la pieza.
+            \item Rotar la pieza.
+        \end{enumerate}
+
+    \item SwapSimple.
+        \begin{enumerate}
+            \item Intercambiar la pieza actual.
+            \item Mover la pieza.
+            \item Rotar la pieza.
+        \end{enumerate}
+
+    \item SwapDouble.
+        \begin{enumerate}
+            \item Intercambiar la pieza actual.
+            \item Mover la pieza.
+            \item Rotar la pieza.
+            \item \textit{Dejar caer la pieza}
+            \item Mover la pieza.
+            \item Rotar la pieza.
+        \end{enumerate}
+\end{itemize}
+    
+Donde el paso de dejar caer la pieza NO es configurable por el individuo (es fijo) y el resto de movimientos serán un entero que indicará cuántas veces se realiza ese movimiento. Damos ejemplos de cada uno de los movimientos:
+\begin{itemize}
+    \item Intercambiar la pieza actual: $\{0, 1\}$ 0 si no se quiere intercambiar, 1 si se quiere intercambiar.
+    \item Mover la pieza: $\{-5, 5\}$ un entero positivo o negativo. Si es positivo, se moverá esa cantidad de veces a la derecha, si es negativo, se moverá esa cantidad de veces a la izquierda (o hasta que no se pueda mover más).
+    \item Rotar la pieza: $\{0, 1, 2, 3\}$ un entero entre 0 y 3, indicando cuántas veces se rotará la pieza en el sentido de las agujas del reloj.
+    \item \textit{Dejar caer la pieza}: no es configurable, la pieza caerá hasta que toque el suelo o otra pieza.
+    \item Mover la pieza: $\{-9, ..., 9\}$, Igual que el anterior.
+    \item Rotar la pieza: $\{0, 1, 2, 3\}$, Igual que el anterior.
+\end{itemize}
+
+Como optimización en este punto se ha propuesto lo siguiente: dado que las piezas aparecen en cierta posición concreta, el rango de movimientos laterales que se hace al principio se ha limitado a un rango de -5 a 5. Esto es, si una pieza aparece en la columna 5 del tablero, no tendría sentido moverla más de 5 veces a izquierda o derecha (ya que se saldría del tablero).
+
+\section{Tipo de individuos}
+
+\section{Función objetivo}
+
+\chapter{Tecnología de Implementación}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           TÉCNOLOGÍAS PLANTEADAS                            %
@@ -201,25 +265,23 @@ def generate_prompt(df_train: pd.DataFrame, df_batch: pd.DataFrame, genres: str)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Modelos clásicos}
+\section{Algoritmo genético}
 
-\section{Transformers}
-
-\section{LLMs}
+\section{Enfriamiento simulado}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               RESULTADOS DE LA SOLUCIón                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\chapter{Resultado de las soluciones}
-A continuación presentamos los resultados que han obtenido los modelos planteados en cada categoría.
+\chapter{Resultado}
 
-\section{Clásicos}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Algoritmo genético}
 
-\section{Transformers}
+\section{Enfriamiento simulado}
 
+\section{Evolución}
 
-\section{LLMs}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 CONCLUSIONES                                 %
