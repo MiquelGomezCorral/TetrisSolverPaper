@@ -179,18 +179,18 @@ def generate_prompt(df_train: pd.DataFrame, df_batch: pd.DataFrame, genres: str)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mainmatter
 \chapter{Codificación}
-En este apartado se habla de como se han codificado los individuos para abordar el problema. Recordar que el objetivo es encontrar, para un set de piezas concreto, la posición y orientación óptima de cada pieza para minimizar el espacio ocupado. A eso hay que añadirle dos reglas del juego: al completar una línea esta se limpia, y las piezas no pueden estar flotando al colocarse.
+En este apartado se habla de como se han codificado los individuos para abordar el problema. Recordar que el objetivo es encontrar, para un set de piezas concreto, la posición y orientación óptima de cada pieza para minimizar el espacio ocupado. A eso hay que añadirle dos reglas del juego: primero que al completar una línea esta se limpia, y segundo que las piezas no pueden estar flotando al colocarse.
 
-Con esto, se parte de la idea de 'jugar' al Tetris. La propuesta tras esta premisa no es jugar al juego de verdad, sino conseguir una codificación que permita cumplir las restricciones impuestas, y conseguir soluciones que minimicen el espacio ocupado sin necesidad de descartar individuos inválidos. 
+Con esto, se parte de la idea de 'jugar' al Tetris. La propuesta tras esta premisa no es jugar al juego de verdad, sino conseguir una codificación que permita cumplir las restricciones impuestas, consiguiendo soluciones que minimicen el espacio ocupado sin necesidad de descartar individuos inválidos. 
 
-La forma de atacar este problema de cobertura, será definiendo una serie de movimiento posibles. Con ellos, se codifica la posición final de cada pieza como una secuencia de estos. Así pues, cada genotipo será una secuencia de movimientos tras otros, de forma que si hay $x$ moviemientos válidos y se disponone de $n$ piezas, la codificación del genotipo será una secuencia $x \times n$ movimientos.
+La forma de atacar este problema de cobertura, será definiendo una serie de movimiento posibles. Se codifica la posición final de cada pieza como una secuencia de estos. Así pues, cada genotipo será una secuencia de movimientos, de forma que si hay $x$ movimientos válidos y se dispone de $n$ piezas, la codificación de un genotipo será una secuencia $x \times n$ movimientos.
 
-Al codificar los genotipos de esta forma, los individuos resultantes serán siempre válidos, ya que cada pieza se colocará en el tablero siguiendo las reglas del juego. Esto implica también que deberemos ser capaces de simular el juego para poder evaluar cada individuo, ya que la fenotipo de cada individuo será el estado final del tablero tras colocar todas las piezas siguiendo los movimientos indicados en el genotipo. 
+Al codificar los genotipos de esta forma, los individuos resultantes serán siempre válidos, ya que cada pieza se colocará en el tablero siguiendo las reglas del juego. Esto implica también que deberemos ser capaces de simular el juego para poder evaluar cada individuo, ya que el fenotipo de cada individuo será el estado final del tablero tras colocar todas las piezas siguiendo los movimientos indicados en el genotipo.
 
-También, habrá movimiento que resulten en '\textit{no-op}', como intentar mover una pieza a la izquierda cuando ya está en el borde izquierdo del tablero. Más abajo vemos como se gestionan estos casos.
+También, habrá movimientos que resulten en '\textit{no-op}', como intentar mover una pieza a la izquierda cuando ya está en el borde izquierdo del tablero. Más abajo vemos como se gestionan estos casos con la función objetivo.
 
-\section{Movimientos posibles}
-Cuando decimos codificar los individuos como una secuencia de movimientos, es necesario definir qué podrán hacer estos. Si nos fijamos en el juego original, los movimientos posibles son:
+\section{Movimientos posibles y tipos de genotipo}
+Cuando decimos codificar los individuos como una secuencia de movimientos, es necesario definir cuales son estos. Si nos fijamos en el juego original, los movimientos posibles son:
 
 \begin{itemize}
     \item Mover la pieza a la izquierda.
@@ -201,19 +201,19 @@ Cuando decimos codificar los individuos como una secuencia de movimientos, es ne
     \item Intercambiar la pieza actual por la siguiente (o por una ya cambiada anteriormente)
 \end{itemize}
 
-En el juego original cuando se dejaba caer una pieza y esta toca el suelo, se bloqueaba al instante. Sin embargo, en versiones más modernas, esto no es así y aún habiendo tocado el suelo se permite mover la pieza con unas ciertas reglas. En este casi estaríamos hablamos de un Tetris Tetris 99 \cite{}, donde se permite que las piezas se muevan con más libertad y por tanto, se da más capacidad de representación al jugador. Es por todo esto que elegimos usar esta versión del juego y no la clásica con el objetivo de dotar a los individuos de más capacidad de representación lo que potencialmente, debería permitirnos llegar a mejores soluciones.
+En el juego original cuando se dejaba caer una pieza y esta toca el suelo, se bloqueaba al instante. Sin embargo, en versiones más modernas, esto no es así y aún habiendo tocado el suelo, se permite mover la pieza con unas ciertas reglas. En este caso, se hablaría hablando de un Tetris moderno como el Tetris 99 \cite{}, donde se permite que las piezas se muevan con más libertad y por tanto, se da más capacidad de representación al jugador. Es por todo esto que se ha elegido usar esta versión del juego y no la clásica. El objetivo de esta decisión es dotar a los individuos de más capacidad de representación lo que potencialmente, debería permitirnos llegar a mejores soluciones.
 
-Ahora, si se tiene algo de experiencia en el juego, se puede ver que no en todas las situaciones todos los movimientos son necesarios para llegar a una solución concrata. Sin ir más lejos, en casos donde el tablero está casi vacío y no hay piezas creando agujeros, siempre se podrá poner una pieza en cualquiera de las posiciones validas con una \textit{rotación} y un \textit{movimiento lateral}. 
+Ahora, si se tiene algo de experiencia en el juego, se puede ver que no en todas las situaciones, todos los movimientos son necesarios para llegar a una solución concreta. Sin ir más lejos, en casos donde el tablero está casi vacío y no hay piezas creando agujeros, siempre se podrá poner una pieza en cualquiera de las posiciones validas con una \textit{rotación} y un \textit{movimiento lateral}.
 
-Como tampoco queremos eliminar de la experimentación la posibilidad de ver los efectos que tiene el sí hacer más movimientos una vez las piezas han tocado el suelo, se han configurado cuatro sets posibles de movimientos:
+Como tampoco queremos eliminar de la experimentación la posibilidad de ver los efectos que tiene el sí hacer más movimientos una vez las piezas han tocado el suelo, se han planteado cuatro sets posibles de movimientos que podrán usar los individuos:
 \begin{itemize}
-
-    \item Simple.
+    \item Simple:
         \begin{enumerate}
             \item Mover la pieza.
             \item Rotar la pieza.
         \end{enumerate}
-    \item Double.
+
+    \item Double:
         \begin{enumerate}
             \item Mover la pieza.
             \item Rotar la pieza.
@@ -222,14 +222,14 @@ Como tampoco queremos eliminar de la experimentación la posibilidad de ver los 
             \item Rotar la pieza.
         \end{enumerate}
 
-    \item SwapSimple.
+    \item SwapSimple:
         \begin{enumerate}
             \item Intercambiar la pieza actual.
             \item Mover la pieza.
             \item Rotar la pieza.
         \end{enumerate}
 
-    \item SwapDouble.
+    \item SwapDouble:
         \begin{enumerate}
             \item Intercambiar la pieza actual.
             \item Mover la pieza.
@@ -240,7 +240,7 @@ Como tampoco queremos eliminar de la experimentación la posibilidad de ver los 
         \end{enumerate}
 \end{itemize}
     
-Donde el paso de dejar caer la pieza NO es configurable por el individuo (es fijo) y el resto de movimientos serán un entero que indicará cuántas veces se realiza ese movimiento. Damos ejemplos de cada uno de los movimientos:
+Donde el paso de \textit{dejar caer la pieza} NO es configurable por el individuo (es fijo) y el resto de movimientos serán un entero que indicará cuántas veces se realiza ese movimiento. Damos ejemplos de cada uno de los movimientos:
 \begin{itemize}
     \item Intercambiar la pieza actual: $\{0, 1\}$ 0 si no se quiere intercambiar, 1 si se quiere intercambiar.
     \item Mover la pieza: $\{-5, 5\}$ un entero positivo o negativo. Si es positivo, se moverá esa cantidad de veces a la derecha, si es negativo, se moverá esa cantidad de veces a la izquierda (o hasta que no se pueda mover más).
@@ -252,9 +252,108 @@ Donde el paso de dejar caer la pieza NO es configurable por el individuo (es fij
 
 Como optimización en este punto se ha propuesto lo siguiente: dado que las piezas aparecen en cierta posición concreta, el rango de movimientos laterales que se hace al principio se ha limitado a un rango de -5 a 5. Esto es, si una pieza aparece en la columna 5 del tablero, no tendría sentido moverla más de 5 veces a izquierda o derecha (ya que se saldría del tablero).
 
-\section{Tipo de individuos}
+Por último, mencionar que cuando una pieza termine de ser movida se bloqueará al momento, dejándola caer hasta tocar el suelo u otra pieza y añadiéndola al tablero.
+
+\section{Conversión genotipo a fenotipo}
+Como hemos mencionado, la idea es simular el juego a partir de los movimientos establecidos para cada pieza. De tal forma que un genotipo, representado por una secuencia de enteros (movimientos), se convierta en un fenotipo, aplicando cada jugada a la secuencia de piezas predeterminada, siendo que el estado final del tablero tras colocar todas las piezas será el fenotipo asociado.
+
+Antes de definir un genotipo, habrá que definir un set de piezas concreto y qué movimientos se pueden realizar con cada una de ellas. A estos sets o tipos se les ha llamado \texttt{Genotype}. Con ambos datos, se podrá simular el juego con los movimientos indicados en el genotipo y el tablero final será el fenotipo asociado.
+
+Este set de piezas será el mismo para todos los individuos, y se generará aleatoriamente al inicio de la ejecución del algoritmo. 
 
 \section{Función objetivo}
+Una vez sabemos como convertir un genotipo en fenotipo, es necesario definir una función objetivo que nos permita evaluar la calidad de cada solución. Dado que el objetivo es minimizar el espacio ocupado en el tablero, se ha definido la siguiente función objetivo:
+
+\begin{align*}
+\text{Fitness(genotipo)} = f(g) &= \text{factor juego}\times\text{puntuación juego} \\
+&+ \text{factor penalización}\times\text{penalización} \\
+&+ \text{factor heurísticas}\times\text{heurísticas}
+\end{align*}
+
+Desglosemos cada uno de los términos:
+\begin{itemize}
+    \item \textbf{Puntuación juego}: es la puntuación obtenida tras jugar la partida con el genotipo indicado. Esta puntuación se calcula como en el juego original, donde se otorgan puntos por cada línea completada, y se otorgan puntos extra por completar varias líneas a la vez (doble, triple, tetris) \cite{}. Se omiten puntos extra por combos o por dejar caer las piezas rápidamente, ya que no aportan nada a la calidad de la solución.
+    
+    \item \textbf{Penalización}: es una penalización que se aplica en caso de que el genotipo contenga movimientos inválidos o '\textit{no-op}' como se han definido anteriormente. La penalización será proporcional al número de movimientos inválidos realizados. Estas son calculadas durante la conversión de genotipo a fenotipo, en la simulación del juego.
+    
+    \item \textbf{Heurísticas}: son una serie de métricas que evalúan la calidad del tablero final tras colocar todas las piezas. En este punto es donde más se puede influir en la calidad de la solución, ya que la puntuación del juego puede ser similar para tableros muy diferentes, pero las heurísticas permitirán guiar a los algoritmos hacia mejores soluciones sin necesidad de completar muchas líneas. Además, cada heurística tendrá un peso o factor asociado, que permitirá ajustar su importancia en la función objetivo. 
+\end{itemize}
+
+\subsection{Heurísticas}
+Se han definido las siguientes heurísticas para evaluar la calidad del tablero final. El origen de todas ellas es una mezcla entre heurísticas clásicas usadas en la literatura para jugar al Tetris con IA \cite{}, videos de youtube \cite{} y experiencia personal.
+
+\begin{itemize}
+    \item \textbf{Altura Agregada (Blocks)}: Suma absoluta de la cantidad de bloques que hay en el tablero. 
+    \item \textbf{Altura Ponderada (Weighted Blocks)}: Similar a la anterior, pero las columnas más altas tienen un peso mayor. Esto penaliza de forma más severa la creación de picos o torres altas en el tablero.
+    \item \textbf{Líneas Limpiables (Clearable Lines)}: Recompensa el número de líneas completas que se pueden eliminar con una sola pieza 'I' (la línea recta). Es una métrica directa de la puntuación que se obtendría en el juego. Su Implementación está orientada a que soluciones vecinas completen más líneas al explorar.
+    \item \textbf{Rugosidad (Roughness)}: Suma de las diferencias de altura absolutas entre columnas adyacentes. Un valor alto indica un tablero no plano, lo que crea una solución peor 'compacta' y que ocupa potencialmente más espacio.
+    \item \textbf{Agujeros por Columna (Column Holes)}: Número de huecos columnas con agujeros. Una agujero se define como un espacio vacío que tiene al menos un bloque por encima en la misma columna. Penaliza la creación de agujeros en las soluciones.
+    \item \textbf{Agujeros Conectados (Connected Holes)}: Número de agujeros que son adyacentes a otros agujeros. Penaliza la creación de grandes bolsas de aire que son difíciles de rellenar.
+    \item \textbf{Bloques sobre Agujeros (Blocks Above Holes)}: Número de bloques que se encuentran directamente encima de un agujero. Penaliza fuertemente los agujeros que están enterrados, ya que dejan grandes cavidades.
+    \item \textbf{Porcentaje de Hoyos (Pit Hole Percent)}: Porcentaje de columnas que tienen un 'Hoyo'. Un hoyo se define como una columna que tiene bloques más altos en ambas columnas adyacentes. 
+    \item \textbf{Hoyos más Profundo (Deepest Well)}: La profundidad de la columna más profunda de todas. Sería el mínimo de entre las alturas del bloque más alto de cada columna.
+\end{itemize}
+
+La combinación de estas heurísticas, cada una con su respectivo factor de ponderación, conforma la puntuación final de la heurística, como se muestra en la siguiente fórmula:
+
+\begin{align*}
+\text{Heurísticas} = \sum_{h \in H} w_h \times \text{score}(h)
+\end{align*}
+
+Donde $H$ es el conjunto de todas las heurísticas mencionadas, $w_h$ es el factor de ponderación para la heurística $h$, y $\text{score}(h)$ es el valor calculado para dicha heurística en el tablero final. Esta función se pretende \textbf{MAXIMIZAR}.
+
+\subsection{Pesos de la función objetivo}
+Los factores que ponderan cada uno de los términos de la función objetivo, se han establecido tras una serie de pruebas preliminares, referencias en la literatura \cite{} y 'a ojo'. Lo ideal sería poder lanzar una serie de experimentos para ajustar estos pesos, pero por limitaciones computacionales y de 'sentido' no ha sido posible.
+
+Se dice 'sentido' porque alrededor de ajustar estos pesos, que al final no dejan de ser hiperparámetros, se podrían crear proyectos enteros. Un ejemplo sería usar técnicas metaheurísticas para ajustar estos pesos, como un algoritmo genético que optimice los pesos de las heurísticas, o incluso alguna técnica bayesiana más moderna.
+
+Es por todo esto que al final hemos decidido fijar unos pesos 'a mano' basándonos lo mencionado anteriormente. En concreto, se han elegido los siguientes pesos:
+\begin{table}[H]
+    \centering
+    \caption{Pesos de los componentes principales de la función objetivo.}
+    \label{tab:pesos_principales}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Componente} & \textbf{Peso} \\
+        \midrule
+        Factor de Puntuación del Juego & 2.5 \\
+        Factor de Penalización & -1.0 \\
+        Factor General de Heurísticas & 1.0 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+A su vez, los pesos para cada una de las heurísticas individuales, que componen el término de heurísticas, se detallan en la Tabla \ref{tab:pesos_heuristicas}.
+
+\begin{table}[H]
+    \centering
+    \caption{Pesos para cada heurística individual.}
+    \label{tab:pesos_heuristicas}
+    \begin{tabular}{lc}
+        \toprule
+        \textbf{Heurística} & \textbf{Peso} \\
+        \midrule
+        Blocks & -1.0 \\
+        Weighted Blocks & -0.75 \\
+        Clearable Lines & 1.0 \\
+        Roughness & -1.0 \\
+        Column Holes & -5.0 \\
+        Connected Holes & -2.0 \\
+        Blocks Above Holes & -2.0 \\
+        Pit Hole Percent & -1.0 \\
+        Deepest Well & -1.0 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Como vemos, gran parte de estos factores son negativos. El problema a solucionar es minimización del espacio ocupado, pero la función objetivo está planteada como maximización. La idea tras todo esto es que \textbf{estas heurísticas codifiquen el concepto de 'minimización del espacio'} y guíen la búsqueda de soluciones. Por lo tanto, se penaliza todo aquello que aleje al tablero de este ideal y se recompensa lo que lo acerque.
+
+\subsection{Notas}
+Comentar ciertos aspectos importantes a modo de resumen sobre la función objetivo:
+\begin{itemize}
+    \item Como se ha mencionado, el problema consiste en la minimización del espacio ocupado. La función objetivo \textbf{codifica este concepto a través de las heurísticas}, que penalizan tableros con mucho espacio vacío, agujeros, rugosidad, etc.
+    \item La puntuación del juego se incluye para incentivar la eliminación de líneas, que es un objetivo secundario pero relevante en el Tetris y puede ayudar a la búsqueda de soluciones óptimas, ya que al limpiar piezas, se libera espacio en el tablero.
+    \item La penalización por movimientos inválidos, se incluye para evitar penalizar individuos con movimientos innecesarios. Ya que simulamos el juego, NO tenemos individuos inválidos, pero siempre preferimos individuos que usen todos sus movimientos a aquellos que no se intentan mover innecesariamente.
 
 \chapter{Tecnología de Implementación}
 
@@ -262,6 +361,8 @@ Como optimización en este punto se ha propuesto lo siguiente: dado que las piez
 %                           TÉCNOLOGÍAS PLANTEADAS                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Implementación}
+
+\section{Implementación del Tetris}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
