@@ -630,10 +630,75 @@ Es así como se ha optado por elegir $temp_{initial} = 2$, de forma que el algor
 \chapter{Experimentación}
 En este capítulo se describen los experimentos realizados para evaluar el rendimiento de los algoritmos implementados. Se detallan los parámetros probados de cada algoritmo, en que rango se han explorado y las decisiones tomadas para elegir los valores finales usados en la sección de Resultados.
 
+Como se ha mencionado, la primera acotación de los parámetros a probar se hizo de forma manual y no documentada. Sin embargo, esta fase preliminar ha servido para acotar la experimentación exhaustiva que se plantea en este apartado, lo que ha permitido identificar los enfoques que prometen los mejores resultados.
+
 \section{Algoritmo genético}
+Una vez definidas las partes principales del algoritmo genético, es necesario definir los parámetros a probar y los valores que se han explorado para cada uno de ellos. 
+
+Para cada tipo de dificultad: 10 piezas, 20 piezas y 30 piezas (Fácil, Medio y Difícil), se han probado los siguientes parámetros:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Parámetro} & \textbf{Valores probados} \\
+        \hline
+        Tipo de individuo & Simple, Double, SwapSimple, SwapDouble \\
+        \hline
+        Tamaño de la población & $10000$, $20000$, $30000$ individuos \\
+        \hline
+        Probabilidad de mutación & $5\%$, $15\%$, $25\%$ \\
+        \hline
+    \end{tabular}
+    \caption{Parámetros probados para el algoritmo genético}
+    \label{tab:parametros_ga}
+\end{table}
+
+En total, con estos parámetros, se han realizado $4 \times 3 \times 3 = 36$ experimentos para cada tipo de dificultad, por lo que en total han sido, SOLO para el algoritmo genético, $36 \times 4 = 144$ experimentos. 
+
+Cada experimento se ha ejecutado durante un máximo de $3000$ generaciones y con una paciencia de $400$ generaciones. En caso de no conseguir una mejor solución tras $400$ generaciones o en caso de superar las $3000$, se ha registrado el mejor individuo encontrado hasta el momento como solución final.
+
+Durante cada iteración se ha registrado el mejor fitness de la generación actual, junto con la temperatura en ese momento. De esta forma, se puede analizar la evolución del algoritmo a lo largo del tiempo.
 
 \section{Enfriamiento simulado}
+De forma similar a como se ha hecho en el apartado anterior, para el Enfriamiento simulado se han probado los siguientes parámetros para cada tipo de dificultad: 10 piezas, 20 piezas y 30 piezas (Fácil, Medio y Difícil):
 
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{Parámetro} & \textbf{Valores probados} \\
+        \hline
+        Tipo de individuo & Simple, Double, SwapSimple, SwapDouble \\
+        \hline
+        Factor de enfriamiento & $0.00005$, $0.0005$, $0.005$, $0.05$ \\
+        \hline
+        Tamaño lista tabú & $5$, $10$, $20$ \\
+        \hline
+    \end{tabular}
+    \caption{Parámetros probados para el enfriamiento simulado}
+    \label{tab:parametros_sa}
+\end{table}
+
+Para la paciencia que maneja el incremento de la temperatura, se ha optado por un valor dinámico que depende del número de piezas y de la cantidad de movimientos por pieza. La fórmula usada es simple:
+$$
+T_{paciencia} = nPiezas \times nMovimientosPorPieza 
+$$
+
+De esta forma, lo que nos aseguramos es de visitar todos los vecinos al menos una vez antes de considerar que el algoritmo está estancado y aumentar la temperatura.
+
+En total, con estos parámetros, se han realizado $4 \times 3 \times 3 = 36$ experimentos para cada tipo de dificultad, por lo que en total han sido, SOLO para el enfriamiento simulado, $36 \times 4 = 144$ experimentos.
+
+Cada experimento se ha ejecutado durante un máximo de $100\;000$ generaciones y con una paciencia de $10\;000$ generaciones. En caso de no conseguir una mejor solución tras $10\;000$ generaciones o en caso de superar las $100\;000$, se ha registrado el mejor individuo encontrado hasta el momento como solución final.
+
+Durante cada iteración se ha registrado el mejor fitness de la generación actual, junto con la temperatura en ese momento. De esta forma, se puede analizar la evolución del algoritmo a lo largo del tiempo.
+
+\section{Duración experimentos}
+Todos los experimentos se han ejecutado en mi máquina personal. Las máquina tiene como procesador un CPU Ryzen 9 9000 con 64GB RAM, por lo que se puede considerar una capacidad de cómputo alta. Ahora, el tiempo de ejecución de cada experimento varía mucho dependiendo del tipo de algoritmo, el tipo de individuo y la cantidad de piezas a optimizar. 
+
+Por ejemplo, los experimentos del algoritmo genético con 10 piezas tardan entre $1$ y $15$ minutos en completarse, mientras que los experimentos con 20 y 30 piezas pueden tardar entre $10$ y $120$ minutos, variando también según la cantidad de individuos y si converge o no antes de llegar al límite de generaciones.
+
+Para el algoritmo de enfriamiento simulado, los tiempos son generalmente más cortos, oscilando entre $1$ y $10$ minutos para 10 piezas, y entre $5$ y $20$ minutos para 20 y 30 piezas. Esto se debe a la naturaleza más simple de los movimientos y la estructura del algoritmo en comparación con el algoritmo genético.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               RESULTADOS DE LA SOLUCIón                     %
