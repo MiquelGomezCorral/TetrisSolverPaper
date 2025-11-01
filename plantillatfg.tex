@@ -639,16 +639,14 @@ Para cada tipo de dificultad: 10 piezas, 20 piezas y 30 piezas (Fácil, Medio y 
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|l|l|}
-        \hline
+    \begin{tabular}{ll}
+        \toprule
         \textbf{Parámetro} & \textbf{Valores probados} \\
-        \hline
+        \midrule
         Tipo de individuo & Simple, Double, SwapSimple, SwapDouble \\
-        \hline
         Tamaño de la población & $10000$, $20000$, $30000$ individuos \\
-        \hline
         Probabilidad de mutación & $5\%$, $15\%$, $25\%$ \\
-        \hline
+        \bottomrule
     \end{tabular}
     \caption{Parámetros probados para el algoritmo genético}
     \label{tab:parametros_ga}
@@ -665,16 +663,14 @@ De forma similar a como se ha hecho en el apartado anterior, para el Enfriamient
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|l|l|}
-        \hline
+    \begin{tabular}{ll}
+        \toprule
         \textbf{Parámetro} & \textbf{Valores probados} \\
-        \hline
+        \midrule
         Tipo de individuo & Simple, Double, SwapSimple, SwapDouble \\
-        \hline
         Factor de enfriamiento & $0.00005$, $0.0005$, $0.005$, $0.05$ \\
-        \hline
         Tamaño lista tabú & $5$, $10$, $20$ \\
-        \hline
+        \bottomrule
     \end{tabular}
     \caption{Parámetros probados para el enfriamiento simulado}
     \label{tab:parametros_sa}
@@ -694,6 +690,8 @@ Cada experimento se ha ejecutado durante un máximo de $100\;000$ generaciones y
 Durante cada iteración se ha registrado el mejor fitness de la generación actual, junto con la temperatura en ese momento. De esta forma, se puede analizar la evolución del algoritmo a lo largo del tiempo.
 
 \section{Duración experimentos}
+En total se han realizado $144 + 144 = 288$ experimentos, cada uno con distintas duraciones dependiendo de los parámetros usados.
+
 Todos los experimentos se han ejecutado en mi máquina personal. Las máquina tiene como procesador un CPU Ryzen 9 9000 con 64GB RAM, por lo que se puede considerar una capacidad de cómputo alta. Ahora, el tiempo de ejecución de cada experimento varía mucho dependiendo del tipo de algoritmo, el tipo de individuo y la cantidad de piezas a optimizar. 
 
 Por ejemplo, los experimentos del algoritmo genético con 10 piezas tardan entre $1$ y $15$ minutos en completarse, mientras que los experimentos con 20 y 30 piezas pueden tardar entre $10$ y $120$ minutos, variando también según la cantidad de individuos y si converge o no antes de llegar al límite de generaciones.
