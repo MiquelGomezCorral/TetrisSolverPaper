@@ -177,6 +177,10 @@ def generate_prompt(df_train: pd.DataFrame, df_batch: pd.DataFrame, genres: str)
 \chapter{Introducción}
 
 \section{Problema a resolver}
+Minimización de la cobertura con restricciones 
+
+\section{Dificultad del problema}
+Escala con el número de piezas. 10 es 'fácil', 20 'medio' y 30 'difícil'. Más no por limitaciones temporales y computacionales.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                         ANÁLISIS DEL PROBLEMA                               %
@@ -544,22 +548,34 @@ Cabe destacar que además, a la hora de evaluar las fitness de la nueva generaci
 \section{Enfriamiento simulado}
 De forma similar a como se ha hecho en el apartado anterior, para el Enfriamiento simulado (Simulated Annealing, SA) \cite{} se ha implementado siguiendo los principios básicos de esta técnica de optimización. Siguiendo lo mencionado en la introducción a este apartado, se habla de como se llevan a cabo los pasos del algoritmo, en concreto: la definición de Vecindario, la lista Tabu, la Paciencia y el Enfriamiento de la temperatura.
 
+Primero que todo mencionar que, a diferencia del algoritmo genético, el Enfriamiento simulado parte de un único individuo inicial y va explorando soluciones vecinas a este individuo. Por lo tanto, no hay una población de individuos, sino un único individuo que se va actualizando a lo largo de la ejecución del algoritmo.
+
+Este individuo es generado de forma aleatoria al inicio, de forma similar a como se ha hecho en la sección de Población inicial del algoritmo genético. Se plantea más abajo el usar como individuo inicial el mejor individuo encontrado por el algoritmo genético, pero por limitaciones de tiempo no se ha podido implementar.
+
+Recordar también que el algoritmo de Enfriamiento simulado tiene un parámetro de temperatura que controla la probabilidad de aceptar soluciones peores a la actual. Si una mejor solución aparece SIEMPRE la elegimos, pero si no, se acepta con una probabilidad que depende de la temperatura, de forma que se pueda escapar de óptimos locales. Ya que estamos maximizando, la probabilidad de aceptar en estos casos se calcula como:
+
+$$
+P(aceptar) = \min(1, \quad e^{\frac{\Delta fitness}{temp}})
+$$
+
+Donde $\Delta fitness$ es la diferencia de fitness entre la solución actual y la nueva solución vecina, y $temp$ es la temperatura actual del sistema.
+
 \subsection{Vecindario}
-Para el algoritmo del Enfriamiento simulado, se ha recordar que no se parte de una población inicial, sino de un único individuo inicial. Por lo tanto, es necesario definir cómo se generan soluciones vecinas a partir de un individuo actual. 
+Una vez tenemos este individuo inicial, es necesario definir cómo se generan soluciones vecinas a partir de él.
 
-Dada la naturaleza del problema y la codificación elegida, no hay otra forma de definir el vecindario que no sean aquellos indivuduos cuyos valores en el genotipo difieran en un único movimiento. Es decir, se generan soluciones vecinas mutando un único movimiento del individuo actual.
+Dada la naturaleza del problema y la codificación elegida, no hay otra forma de definir el vecindario que no sean aquellos individuos cuyos valores en el genotipo difieran en un único movimiento. Es decir, se generan soluciones vecinas mutando un único movimiento del individuo actual.
 
-La primera implementación de este vecindario se hizo usando la mutación cercana, es decir, generando un nuevo valor cercano al valor actual del movimiento. Sin embargo, tras varias pruebas se vio que este método no generaba soluciones vecinas suficientemente diversas, por lo que se optó por usar la mutación aleatoria total, generando un nuevo valor aleatorio dentro del rango permitido para ese movimiento.
+La primera implementación de este vecindario se hizo usando la mutación cercana, es decir, generando un nuevo valor cercano al valor actual del movimiento. Sin embargo, tras varias pruebas se vio que este método no generaba soluciones vecinas suficientemente diversas, por lo que se optó por usar la mutación aleatoria total, generando un nuevo valor aleatorio dentro del rango permitido para ese movimiento. \textit{Se observa lo mismo que antes, la exploración limitada de mutaciones cercanas no permite escapar de óptimos locales.}
 
 Con algo más de experimentación se vió que este método generaba buenas soluciones, pero parecía saltarse algunas posibles intermedias o se quedaba estancado sin saltar de individuo. Por ello, se ha terminado optando por generar una lista de todos los movimientos posibles para cada pieza (según el tipo de individuo) e iterar sobre todas ellas para generar soluciones vecinas de forma ordenada. Cuando todas las soluciones de una pieza han sido exploradas, se pasa a la siguiente pieza y se repite el proceso hasta haber explorado todas las piezas.
 
-La forma en la que se generan esta lista es simple y complejo a la vez. Ya que se saben todos los valores posibles para cada movimiento (ver Apéndice \ref{appendix:movimientos}), se pueden indexar en una lista los valores que puede tener cada movimiento. Por ejemplo, si estamos en \texttt{SwapSimple}, los posibles valores son 
+La forma en la que se generan esta lista es simple y compleja a la vez, ya que se hace optimizando el espacio y no generando de verdad todas las combinaciones. Partimos de saber todos los valores posibles para cada movimiento (ver Apéndice \ref{appendix:movimientos}), así pues es posible indexar en una lista los valores que puede tener cada movimiento. Por ejemplo, si estamos en \texttt{SwapSimple}, los posibles valores son 
 
 $$
 [0, 1, \quad -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, \quad 0, 1, 2, 3]
 $$
 
-Donde los primeros dos valores corresponden al movimiento de intercambio de pieza, los siguientes once al movimiento lateral inicial, y los últimos cuatro a la rotación inicial.
+Donde los primeros dos valores corresponden al intercambio de pieza, los siguientes once al movimiento lateral inicial, y los últimos cuatro a la rotación inicial.
 
 Ya que estos $M$ movimientos son fijos, y se tienen $N$ piezas, se puede iterar de $0$ a $N\times M - 1$ con un índice $idx$ y calcular a qué pieza y movimiento corresponde dicho valor, intercambiarlo generando un nuevo individuo y evaluarlo. El cálculo es el siguiente:
 
@@ -573,20 +589,47 @@ int valueIndex = idx / (nPieces * allMovements.Length);
 valueIndex = valueIndex % allMovements[moveTypeIndex].Length;
 \end{lstlisting}
 
-Con esto, cada vez que se itera sobre $idx$, se obtiene la pieza y el movimiento a mutar, junto con el nuevo valor a asignar. De esta forma, se exploran todas las soluciones vecinas de forma ordenada. Si al terminar de explorar todas las soluciones NO se ha encontrado una mejor solución, se reinicia el índice $idx$ a $0$ y se vuelve a empezar.
+Con esto, cada vez que se itera sobre $idx$, se obtiene la pieza y el movimiento a modificar, junto con el nuevo valor a asignar. De esta forma, se exploran todas las soluciones vecinas de forma ordenada. Si al terminar de explorar todas las soluciones NO se ha encontrado una mejor solución, se reinicia el índice $idx$ a $0$ y se vuelve a empezar (con una temperatura menor, ver sección de Enfriamiento de la temperatura).
 
-También, mencionar que para añadir estocasticidad a la exploración no se empieza por $idx = 0$, sino que se genera un valor aleatorio entre $0$ y $N \times M - 1$ para empezar la exploración desde ahí. De esta forma, se evita explorar siempre las mismas soluciones en el mismo orden, lo que podría llevar a estancamientos.
+También, mencionar que para añadir estocasticidad a la exploración, no se empieza por $idx = 0$, sino que se genera un valor aleatorio entre $0$ y $N \times M - 1$ para empezar la exploración desde ahí. De esta forma, se evita explorar siempre las mismas soluciones en el mismo orden, lo que podría llevar a estancamientos.
 
 \subsection{Lista Tabu}
+Debido a la naturaleza del vecindario y la forma en la que se exploran las soluciones vecinas, es posible que el algoritmo vuelva a explorar soluciones ya visitadas. Además, por las dependencias que se crean entre las primeras y últimas piezas, podemos intuir que el espacio se soluciones está lleno de valles gigantes en los que se puede ver estancado el algoritmo. 
 
+Para evitar esto, se ha implementado una lista Tabu que almacena los últimos $K$ individuos visitados. De esa forma, cuando se vaya a explorar una nueva solución, se comprobará si ya ha sido visitada anteriormente. En tal caso, se descartará y se generará una nueva solución en su lugar.
+
+El tamaño de la lista Tabu $K$ es un hiperámetro a definir en la experimentación. Se han probado distintos valores para esta lista, en la fase de experimentación se definen cuales han sido los candidatos en los experimentos. 
 
 \subsection{Paciencia y Enfriamiento de la temperatura}
+La idea principal del enfriamiento simulado, es definir un parámetro de exploración / explotación que vaya variando a lo largo de la ejecución. El valor de este parámetro marca la probabilidad de aceptar soluciones peores a la actual, de forma que se pueda escapar de óptimos locales y no quedarse atrapado en ellos.
 
+Después de probar distintas formas de variar valor, se ha optado por usar una temperatura inicial alta que vaya decreciendo linealmente a lo largo de la ejecución con un factor de enfriamiento (también hiperparámetros). En cada iteración, el valor de la temperatura se reduce con la fórmula:
+
+$$
+temp_i = \max(0.1\quad, \quad temp_{i-1}\times (1 - coolingFactor))
+$$
+
+Ahora, no podemos siempre decrementar este valor, hay que ser conscientes de si el algoritmo se está quedando estancado o no. La forma de medir este estancamiento se controla mediante una 'paciencia'. 
+
+Si durante $T_paciencia$ iteraciones no se encuentra una mejor solución a la actual (que no mejor solución global), se puede considerar que el algoritmo está estancado y en cada iteración se aumenta la temperatura con la siguiente fórmula:
+
+$$
+temp_i = \max(0.1\quad, \quad temp_{i-1} \times (1 + coolingFactor))
+$$
+
+De esta forma, si el algoritmo se queda estancado, se aumenta la temperatura para favorecer la exploración y poder escapar de óptimos locales. Si se encuentra una mejor solución, se resetea el contador de paciencia y se vuelve a decrementar la temperatura en cada iteración.
+
+\subsection{Temperatura inicial}
+Tras diversas pruebas y ver el comportamiento del algoritmo, se ha visto que con temperaturas medianas / elevadas el algoritmo parece elegir y saltar a soluciones peores con demasiada frecuencia y no consigue 'nada' hasta que el valor no baja de 1. 
+
+Es así como se ha optado por elegir $temp_{initial} = 2$, de forma que el algoritmo tenga iteraciones suficientes para explorar, pero no haga una gran cantidad de forma innecesaria sin encontrar un camino por el que poder avanzar.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           EXPERIMENTACIÓN                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Experimentación}
+En este capítulo se describen los experimentos realizados para evaluar el rendimiento de los algoritmos implementados. Se detallan los parámetros probados de cada algoritmo, en que rango se han explorado y las decisiones tomadas para elegir los valores finales usados en la sección de Resultados.
+
 \section{Algoritmo genético}
 
 \section{Enfriamiento simulado}
