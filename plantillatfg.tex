@@ -186,6 +186,7 @@ Escala con el número de piezas. 10 es 'fácil', 20 'medio' y 30 'difícil'. Má
 %                         ANÁLISIS DEL PROBLEMA                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \mainmatter
+
 \chapter{Codificación}
 En este apartado se habla de como se han codificado los individuos para abordar el problema. Recordar que el objetivo es encontrar, para un set de piezas concreto, la posición y orientación óptima de cada pieza para minimizar el espacio ocupado. A eso hay que añadirle dos reglas del juego: primero que al completar una línea esta se limpia, y segundo que las piezas no pueden estar flotando al colocarse.
 
@@ -395,6 +396,7 @@ Comentar ciertos aspectos importantes a modo de resumen sobre la función objeti
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           TÉCNOLOGÍAS PLANTEADAS                            %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Implementación}
 En este capítulo se describen las tecnologías y herramientas usadas para implementar las soluciones propuestas en este trabajo. Se habla del lenguaje de programación, librerías y frameworks usados, así como de la arquitectura general del sistema.
 
@@ -424,6 +426,7 @@ De igual forma, el cálculo de la función objetivo y las heurísticas se ha opt
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           ALGORITMOS                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Algoritmos}
 En esta sección, se presentan los algoritmos implementados y las decisiones de diseño tomadas durante su desarrollo. La sección se centra en las técnicas y operadores utilizados de cada algoritmo.
 
@@ -627,6 +630,7 @@ Es así como se ha optado por elegir $temp_{initial} = 2$, de forma que el algor
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           EXPERIMENTACIÓN                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Experimentación}
 En este capítulo se describen los experimentos realizados para evaluar el rendimiento de los algoritmos implementados. Se detallan los parámetros probados de cada algoritmo, en que rango se han explorado y las decisiones tomadas para elegir los valores finales usados en la sección de Resultados.
 
@@ -701,7 +705,11 @@ Para el algoritmo de enfriamiento simulado, los tiempos son generalmente más co
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               RESULTADOS DE LA SOLUCIón                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Resultado}
+En este apartado mostramos los resultados obtenidos tras la experimentación exhaustiva realizada. Se presentan comparaciones de como cada tipo de parámetro afecta a las soluciones finales (a su fitness). También se presentan los mejores resultados obtenidos para cada tipo de dificultad y se comparan los rendimientos de los dos algoritmos implementados.
+
+No mostraremos todas las gráficas obtenidas en este apartado, estas estarán en el anexo \ref{appendix:resultados_experimentacion} para aquellos interesados en verlas todas. Aquí se mostrarán las más relevantes y aquellas que ayuden a entender el comportamiento de los algoritmos.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Algoritmo genético}
@@ -714,6 +722,7 @@ Para el algoritmo de enfriamiento simulado, los tiempos son generalmente más co
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 CONCLUSIONES                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \chapter{Conclusiones}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -732,7 +741,7 @@ Para el algoritmo de enfriamiento simulado, los tiempos son generalmente más co
 
 \APPENDIX
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                        EJEMPLOS DE CADA TIPO DE FACTURA                     %
+%                        LISTADO DE SETS DE MOVIMIENTOS Y RANGOS              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Tablas de movimientos}
@@ -817,6 +826,239 @@ La Tabla \ref{tab:rangos_movimientos_appendix} detalla los rangos de valores per
 
 \end{table}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                        RESULTADOS POR CADA HIPERPARÁMETROS                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Resultado de la experimentación}
+\label{appendix:resultados_experimentacion}
+
+En este apéndice se incluyen todas las gráficas obtenidas durante la experimentación exhaustiva realizada. Estas gráficas muestran cómo cada tipo de parámetro afecta a las soluciones finales (a su fitness) para ambos algoritmos implementados.
+
+\section{Algoritmo genético}
+
+\subsection{Evolución general}
+
+A continuación se muestran las gráficas de evolución del algoritmo genético. La Figura \ref{fig:ga_evolution} muestra la evolución del fitness a lo largo de las generaciones, mientras que la Figura \ref{fig:ga_temp_evolution} muestra cómo evoluciona la temperatura del algoritmo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/GA_evolution.png}
+    \caption{Evolución del fitness del algoritmo genético a lo largo de las generaciones.}
+    \label{fig:ga_evolution}
+\end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{images/GA_temp_evolution.png}
+%     \caption{Evolución de la temperatura del algoritmo genético a lo largo de las generaciones.}
+%     \label{fig:ga_temp_evolution}
+% \end{figure}
+
+\subsection{Efecto del tipo de individuo (movimientos)}
+
+Las siguientes gráficas muestran cómo el tipo de individuo (Simple, Double, SwapSimple, SwapDouble) afecta al fitness final obtenido para diferentes cantidades de piezas.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-10_movements.png}
+        \caption{10 piezas (Fácil)}
+        \label{fig:ga_np10_movements}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-20_movements.png}
+        \caption{20 piezas (Medio)}
+        \label{fig:ga_np20_movements}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-30_movements.png}
+        \caption{30 piezas (Difícil)}
+        \label{fig:ga_np30_movements}
+    \end{subfigure}
+    \caption{Efecto del tipo de individuo en el algoritmo genético para diferente Nº de piezas.}
+    \label{fig:ga_movements}
+\end{figure}
+
+\subsection{Efecto de la probabilidad de mutación}
+
+Las siguientes gráficas muestran cómo la probabilidad de mutación (5\%, 15\%, 25\%) afecta al fitness final obtenido para diferentes cantidades de piezas.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-10_mutation.png}
+        \caption{10 piezas (Fácil)}
+        \label{fig:ga_np10_mutation}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-20_mutation.png}
+        \caption{20 piezas (Medio)}
+        \label{fig:ga_np20_mutation}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-30_mutation.png}
+        \caption{30 piezas (Difícil)}
+        \label{fig:ga_np30_mutation}
+    \end{subfigure}
+    \caption{Efecto de la \% de mutación en el algoritmo genético para diferente Nº de piezas.}
+    \label{fig:ga_mutation}
+\end{figure}
+
+\subsection{Efecto del tamaño de población}
+
+Las siguientes gráficas muestran cómo el tamaño de la población (10000, 20000, 30000 individuos) afecta al fitness final obtenido para diferentes cantidades de piezas.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-10_population.png}
+        \caption{10 piezas (Fácil)}
+        \label{fig:ga_np10_population}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-20_population.png}
+        \caption{20 piezas (Medio)}
+        \label{fig:ga_np20_population}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-30_population.png}
+        \caption{30 piezas (Difícil)}
+        \label{fig:ga_np30_population}
+    \end{subfigure}
+    \caption{Efecto del tamaño de población en el algoritmo genético para diferente Nº de piezas.}
+    \label{fig:ga_population}
+\end{figure}
+
+\clearpage
+\section{Enfriamiento simulado}
+
+\subsection{Evolución general}
+
+A continuación se muestra la gráfica de evolución del algoritmo de enfriamiento simulado. La Figura \ref{fig:sa_evolution} muestra la evolución del fitness a lo largo de las iteraciones.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{images/SA_evolution.png}
+    \caption{Evolución del fitness del algoritmo de enfriamiento simulado a lo largo de las iteraciones.}
+    \label{fig:sa_evolution}
+\end{figure}
+
+\subsection{Efecto del tipo de individuo (movimientos)}
+
+Las siguientes gráficas muestran cómo el tipo de individuo (Simple, Double, SwapSimple, SwapDouble) afecta al fitness final obtenido para diferentes cantidades de piezas.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-10_movements.png}
+        \caption{10 piezas (Fácil)}
+        \label{fig:sa_np10_movements}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-20_movements.png}
+        \caption{20 piezas (Medio)}
+        \label{fig:sa_np20_movements}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-30_movements.png}
+        \caption{30 piezas (Difícil)}
+        \label{fig:sa_np30_movements}
+    \end{subfigure}
+    \caption{Efecto del tipo de individuo en el enfriamiento simulado para diferente Nº de piezas.}
+    \label{fig:sa_movements}
+\end{figure}
+
+\subsection{Efecto del tamaño de la lista tabú}
+
+% Las siguientes gráficas muestran cómo el tamaño de la lista tabú (5, 10, 20) afecta al fitness final obtenido para diferentes cantidades de piezas.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-10_tabu.png}
+        \caption{10 piezas (Fácil)}
+        \label{fig:sa_np10_tabu}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-20_tabu.png}
+        \caption{20 piezas (Medio)}
+        \label{fig:sa_np20_tabu}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-30_tabu.png}
+        \caption{30 piezas (Difícil)}
+        \label{fig:sa_np30_tabu}
+    \end{subfigure}
+    \caption{Efecto del tamaño lista tabú en el enfriamiento simulado para diferente Nº de piezas.}
+    \label{fig:sa_tabu}
+\end{figure}
+
+\subsection{Efecto del factor de enfriamiento}
+
+% Ahora, el factor de enfriamiento (0.00005, 0.0005, 0.005, 0.05) afecta al fitness final.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-10_updatefactor.png}
+        \caption{10 piezas (Fácil)}
+        \label{fig:sa_np10_updatefactor}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-20_updatefactor.png}
+        \caption{20 piezas (Medio)}
+        \label{fig:sa_np20_updatefactor}
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/SA_np-30_updatefactor.png}
+        \caption{30 piezas (Difícil)}
+        \label{fig:sa_np30_updatefactor}
+    \end{subfigure}
+    \caption{Efecto factor de enfriamiento en el enfriamiento simulado para diferente Nº de piezas.}
+    \label{fig:sa_updatefactor}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
