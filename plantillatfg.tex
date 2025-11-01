@@ -6,7 +6,7 @@
 %                                                                             %
 % catalan/spanish/english     (idioma principal del trabajo)                  %
 %                                                                             % 
-% french/italian/german...    (si necesitáis usar otro idioma adicional)      %
+% french/italian/german...  (si necesitáis usar otro idioma adicional)      %
 %                                                                             %
 % listoffigures               (El documento incluye un Índice de figuras)     %
 % listoftables                (El documento incluye un Índice de tablas)      %
@@ -44,6 +44,10 @@
 \usepackage{tabularx}
 \usepackage{pgfplots}
 \pgfplotsset{compat=1.18}
+
+% Configuración para usar punto decimal en lugar de coma
+% \usepackage{icomma}
+% \decimalpoint
 
 % Listings para código
 \usepackage{listings}
@@ -206,49 +210,76 @@ En el juego original cuando se dejaba caer una pieza y esta toca el suelo, se bl
 Ahora, si se tiene algo de experiencia en el juego, se puede ver que no en todas las situaciones, todos los movimientos son necesarios para llegar a una solución concreta. Sin ir más lejos, en casos donde el tablero está casi vacío y no hay piezas creando agujeros, siempre se podrá poner una pieza en cualquiera de las posiciones validas con una \textit{rotación} y un \textit{movimiento lateral}.
 
 Como tampoco queremos eliminar de la experimentación la posibilidad de ver los efectos que tiene el sí hacer más movimientos una vez las piezas han tocado el suelo, se han planteado cuatro sets posibles de movimientos que podrán usar los individuos:
-\begin{itemize}
-    \item Simple:
-        \begin{enumerate}
-            \item Mover la pieza.
-            \item Rotar la pieza.
-        \end{enumerate}
 
-    \item Double:
-        \begin{enumerate}
-            \item Mover la pieza.
-            \item Rotar la pieza.
-            \item \textit{Dejar caer la pieza}
-            \item Mover la pieza.
-            \item Rotar la pieza.
-        \end{enumerate}
-
-    \item SwapSimple:
-        \begin{enumerate}
-            \item Intercambiar la pieza actual.
-            \item Mover la pieza.
-            \item Rotar la pieza.
-        \end{enumerate}
-
-    \item SwapDouble:
-        \begin{enumerate}
-            \item Intercambiar la pieza actual.
-            \item Mover la pieza.
-            \item Rotar la pieza.
-            \item \textit{Dejar caer la pieza}
-            \item Mover la pieza.
-            \item Rotar la pieza.
-        \end{enumerate}
-\end{itemize}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Tipo} & \textbf{Secuencia de movimientos} \\
+        \midrule
+        Simple & \begin{tabular}[t]{@{}l@{}}
+            1. Mover la pieza \\
+            2. Rotar la pieza
+        \end{tabular} \\
+        \midrule
+        Double & \begin{tabular}[t]{@{}l@{}}
+            1. Mover la pieza \\
+            2. Rotar la pieza \\
+            3. \textit{Dejar caer la pieza} \\
+            4. Mover la pieza \\
+            5. Rotar la pieza
+        \end{tabular} \\
+        \midrule
+        SwapSimple & \begin{tabular}[t]{@{}l@{}}
+            1. Intercambiar la pieza actual \\
+            2. Mover la pieza \\
+            3. Rotar la pieza
+        \end{tabular} \\
+        \midrule
+        SwapDouble & \begin{tabular}[t]{@{}l@{}}
+            1. Intercambiar la pieza actual \\
+            2. Mover la pieza \\
+            3. Rotar la pieza \\
+            4. \textit{Dejar caer la pieza} \\
+            5. Mover la pieza \\
+            6. Rotar la pieza
+        \end{tabular} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Sets de movimientos posibles para los individuos.}
+    \label{tab:sets_movimientos}
+\end{table}
     
-Donde el paso de \textit{dejar caer la pieza} NO es configurable por el individuo (es fijo) y el resto de movimientos serán un entero que indicará cuántas veces se realiza ese movimiento. Damos ejemplos de cada uno de los movimientos:
-\begin{itemize}
-    \item Intercambiar la pieza actual: $\{0, 1\}$ 0 si no se quiere intercambiar, 1 si se quiere intercambiar.
-    \item Mover la pieza: $\{-5, 5\}$ un entero positivo o negativo. Si es positivo, se moverá esa cantidad de veces a la derecha, si es negativo, se moverá esa cantidad de veces a la izquierda (o hasta que no se pueda mover más).
-    \item Rotar la pieza: $\{0, 1, 2, 3\}$ un entero entre 0 y 3, indicando cuántas veces se rotará la pieza en el sentido de las agujas del reloj.
-    \item \textit{Dejar caer la pieza}: no es configurable, la pieza caerá hasta que toque el suelo o otra pieza.
-    \item Mover la pieza: $\{-9, ..., 9\}$, Igual que el anterior.
-    \item Rotar la pieza: $\{0, 1, 2, 3\}$, Igual que el anterior.
-\end{itemize}
+Donde el paso de \textit{dejar caer la pieza} NO es configurable por el individuo (es fijo) y el resto de movimientos serán un entero que indicará cuántas veces se realiza ese movimiento. Los rangos permitidos para cada tipo de movimiento se detallan en la Tabla \ref{tab:rangos_movimientos}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lp{8cm}}
+        \toprule
+        \textbf{Movimiento} & \textbf{Rango y descripción} \\
+        \midrule
+        Intercambiar la pieza actual & $\{0, 1\}$ \\ 
+        & 0 si no se quiere intercambiar, 1 si se quiere intercambiar. \\
+        \midrule
+        Mover la pieza (inicial) & $\{-5, \dots, 5\}$ \\ 
+        & Un entero positivo o negativo. Si es positivo, se moverá esa cantidad de veces a la derecha; si es negativo, se moverá esa cantidad de veces a la izquierda (o hasta que no se pueda mover más). \\
+        \midrule
+        Rotar la pieza (inicial) & $\{0, 1, 2, 3\}$ \\ 
+        & Un entero entre 0 y 3, indicando cuántas veces se rotará la pieza en el sentido de las agujas del reloj. \\
+        \midrule
+        \textit{Dejar caer la pieza} & No configurable \\ 
+        & La pieza caerá hasta que toque el suelo o otra pieza. \\
+        \midrule
+        Mover la pieza (final) & $\{-9, \dots, 9\}$ \\ 
+        & Igual que el movimiento lateral inicial. \\
+        \midrule
+        Rotar la pieza (final) & $\{0, 1, 2, 3\}$ \\ 
+        & Igual que la rotación inicial. \\
+        \bottomrule
+    \end{tabular}
+    \caption{Rangos de valores permitidos para cada tipo de movimiento.}
+    \label{tab:rangos_movimientos}
+\end{table}
 
 Como optimización en este punto se ha propuesto lo siguiente: dado que las piezas aparecen en cierta posición concreta, el rango de movimientos laterales que se hace al principio se ha limitado a un rango de -5 a 5. Esto es, si una pieza aparece en la columna 5 del tablero, no tendría sentido moverla más de 5 veces a izquierda o derecha (ya que se saldría del tablero).
 
@@ -384,6 +415,174 @@ Para poder hacer la simulación del juego, se ha abstraído todo mediante clases
 
 La Implementación se ha realizado de la forma más optima posible, eliminando operaciones innecesarias y optimizando el código para que la simulación sea lo más rápida posible. Se planeaba paralelizar los experimentos, pero por limitaciones de Unity el resultado era más lento que la versión secuencial, por lo que se ha optado por dejar el paralelismo para futuros trabajos.
 
+De igual forma, el cálculo de la función objetivo y las heurísticas se ha optimizado al máximo, evitando cálculos redundantes y almacenando resultados intermedios cuando es posible. Por ejemplo, en el algoritmo genético se evitaba re-calcular la función objetivo para individuos que no hayan sido reemplazados entre generaciones, más detalles en el capítulo de su Implementación.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           ALGORITMOS                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Algoritmos}
+En esta sección, se presentan los algoritmos implementados y las decisiones de diseño tomadas durante su desarrollo. La sección se centra en las técnicas y operadores utilizados de cada algoritmo.
+
+El proceso de desarrollo incluyó una exploración manual inicial de parámetros y técnicas no documentada, motivada por las limitaciones temporales del curso. Esta fase preliminar ha servido para acotar la experimentación exhaustiva que se ha hecho más tarde, lo que ha permitido identificar los enfoques que prometen los mejores resultados.
+
+Las decisiones finales sobre los algoritmos y el razonamiento de su elección se detallan aquí, mientras que los parámetros específicos que se usaron en la experimentación se explican en la sección de Experimentación. No se pretende omitir todo lo experimentado, sino que se hablará del porqué de las decisiones junto con las alternativas consideradas.
+
+Además, ya que esta memoria tiene como principal objetivo el ser evaluada por el profesor responsable de la asignatura, no se entrará en detalles básicos sobre el funcionamiento de los algoritmos, sino que se explicarán la forma en la que ha implementado cada parte de ellos.
+
+\section{Algoritmo genético}
+El algoritmo genético (Genetic Algorith, GA) \cite{} se ha implementado siguiendo los principios básicos de esta técnica de optimización. Siguiendo lo mencionado anteriormente, se habla de como se llevan a cabo los pasos del algoritmo, en concreto: de la Población inicial, el Cruce, la Mutación, la Selección y el Reemplazo.
+
+\subsection{Población inicial}
+En esta sección se habla de los pasos a seguir para generar individuos nuevos. En las solución final propuesta solo se generan nuevos individuos al inicio. Sin embargo, se ha experimentado incluyendo nuevos individuos en cada generación, pero los resultados no han sido concluyentes por falta de pruebas más exhaustivas. Es por ello que se ha optado por una población inicial fija.
+
+El número de individuos generados es un hiperámetro y se mantendrá constante durante toda la ejecución del algoritmo. A su vez, hay que definir el tipo de individuo a generar (el set de movimientos) junto con el número de piezas con las que se hará la optimización.
+
+Una vez definidos estos parámetros, se generan los N individuos de forma independiente rellenando sus sets de movimientos. Vamos a indicar como se haría para el tipo de individuo \texttt{SwapDouble}, el resto de tipos son iguales pero con menos movimientos.
+
+\begin{enumerate}
+    \item Para cada individuo $i$ desde $1$ hasta $N$:
+    \begin{enumerate}
+        \item Crear un nuevo $individuo_i$ vacío
+        \item Para cada pieza $j$ desde $1$ hasta $P$:
+        \begin{enumerate}
+            \item Generar $swap \gets$ entero aleatorio en $\{0, 1\}$
+            \item Generar $movLateralInicial \gets$ entero aleatorio en $\{-5, \dots, 5\}$
+            \item Generar $rotacionInicial \gets$ entero aleatorio en $\{0, 1, 2, 3\}$
+            \item Generar $movLateralFinal \gets$ entero aleatorio en $\{-9, \dots, 9\}$
+            \item Generar $rotacionFinal \gets$ entero aleatorio en $\{0, 1, 2, 3\}$
+            \item Añadir todos estos movimientos a $individuo_i$ para la pieza $j$
+        \end{enumerate}
+    \end{enumerate}
+    \item Devolver la población con los $N$ individuos generados
+\end{enumerate}
+
+Recordamos que cada movimiento está acotado a un rango concreto para evitar la mayor cantidad de movimiento inválidos posibles. Aún así, como se ha mencionado en la sección de la función objetivo, se penalizan los \textit{no-op}s para evitar que los individuos generen movimientos innecesarios.
+
+\subsection{Selección}
+Para la selección se ha optado por probar tanto el método elitista como el método de tarta. 
+
+Para el método elitista se probaron varios tamaños de élite, pero a la larga no se conseguían buenas soluciones, quedando el algoritmo rápidamente estancado en óptimos locales. 
+
+Por otro lado, el método de tarta parecía tener llegar a buenos resultado, por lo que se ha optado por usar este método en la solución final. En este método, se seleccionan dos padres para el cruce de forma proporcional a su fitness. Es decir, cuanto mejor sea el fitness de un individuo, más probabilidad tendrá de ser seleccionado como padre.
+
+A todos los individuos se les asigna una probabilidad usando la función Softmax \cite{}. Esta función transforma los valores de fitness en probabilidades entre 0 y 1, de forma que la suma de todas las probabilidades sea 1. 
+
+Al inicio se ha optado por usar la Softmax 'pura', pero se ha visto que los individuos con mejor fitness acaparaban casi toda la probabilidad de ser seleccionados, por lo que se ha optado por escalar con la versión 'temperatura' de la Softmax. Esta versión introduce un parámetro de temperatura $T$ que controla la 'suavidad' de la distribución de probabilidades. A mayor $T$, más uniforme será la distribución (más exploración), y a menor $T$, más se acentuará la diferencia entre los individuos, seleccionando solo los mejores (más explotación).
+
+Haciendo varias pruebas se ha optado por una escala de decremento de la temperatura con decremento logarítmico con la formula:
+\begin{align*}
+    temp = \max(0.1\quad, \quad\frac{InitialTemp}{\log(generationI + 2)})
+\end{align*}
+
+Se han probado distintas temperaturas iniciales, pero al final se ha optado por una temperatura MUY alta que favorece la exploración de $InitialTemp = 100$. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{images/GA_temp_evolution.png}
+    \caption{Evolución de la temperatura a lo largo de las generaciones.}
+    \label{fig:temp_evolution}
+\end{figure}
+
+Como vemos en la gráfica, siempre usamos valores muy elevados de temperatura. A lo largo de la memoria se hará más incapié en este punto, pero la EXPLORACIÓN es lo que más ha beneficiado a la generación de buenas soluciones. En sa línea se seleccionan más parámetros en los siguientes puntos.
+
+\subsection{Cruce}
+El cruce parte de poder usar la función de selección para elegir dos padres. Con ellos, se generan dos hijos usando el operador que junta la mitad de las piezas de cada padre para generar un hijo. El proceso es el siguiente:
+
+\begin{enumerate}
+    \item Seleccionar dos padres $padre_1$ y $padre_2$ usando la función de selección.
+    \item Crear hijo $hijo_1$ usando la primera mitad de 'piezas' del $padre_1$ y la segunda mitad de 'piezas' de $padre_2$.
+    \item Crear hijo $hijo_2$ usando la primera mitad e 'piezas' del $padre_2$ y la segunda mitad de 'piezas' del $padre_1$.
+    \item Mutar con probabilidad $p_{mutacion}$ hijo $hijo_1$ (ver sección de mutación).
+    \item Mutar con probabilidad $p_{mutacion}$ hijo $hijo_2$ (ver sección de mutación).
+    \item Devolver $hijo_1$ y $hijo_2$.
+\end{enumerate}
+
+Cuando se dice 'piezas', se hace referencia a todos los movimientos asociados a cada pieza concreta. Por ejemplo, en el tipo de individuo \texttt{Simple}, cada pieza tiene dos movimientos asociados (movimiento lateral inicial, rotación inicial). Por lo tanto, si se está optimizando con diez piezas al hacer el cruce, se copian todos los movimientos asociados a las piezas $\{1\dots5\}$ del $padre_1$ y las $\{6\dots10\}$ del padre $padre_2$ para generar $hijo_1$, mientras que se copian los movimientos de las piezas $\{1\dots5\}$ del $padre_2$ y las $\{6\dots10\}$ del $padre_1$ para generar $hijo_2$.
+
+Ya que ambos padres se codifican como una secuencia de enteros, se podría explicar como
+\begin{align*}
+padre_1 &= [m_{1,1}, m_{1,2},  m_{2,1}, m_{2,2} \dots, m_{10,1}, m_{10,2}] \\
+padre_2 &= [m'_{1,1}, m'_{1,2},  m'_{2,1}, m'_{2,2} \dots, m'_{10,1}, m'_{10,2}] \\
+hijo_1 &= [m_{1,1}, m_{1,2},  m_{2,1}, m_{2,2} \dots, m_{5,1}, m_{5,2}, m'_{6,1}, m'_{6,2} \dots, m'_{10,1}, m'_{10,2}] \\
+hijo_2 &= [m'_{1,1}, m'_{1,2},  m'_{2,1}, m'_{2,2} \dots, m'_{5,1}, m'_{5,2}, m_{6,1}, m_{6,2} \dots, m_{10,1}, m_{10,2}]
+\end{align*}
+
+Por la naturaleza del problema, es apropiado hacer un cruce a nivel de \textbf{piezas continuas}, y no elegir piezas alternadamente de un padre y de otro. La razón tras esto es la dependencia que hay entre una pieza y todas aquellas colocadas a continuación. Si se mezclan piezas de ambos padres de forma alternada, se puede romper la coherencia entre las piezas y generar soluciones peores con mayor probabilidad. Esto se ha descubierto tras probar ambos métodos, y ver que el cruce por piezas continuas generaba mejores soluciones de forma consistente.
+
+También se ha probado creando solo un hijo en lugar de dos y / o NO usando ningún padre (es decir solo mutar). A la larga ninguna otra combinación ha dado mejores resultados que la propuesta, por lo que se ha optado por esta.
+
+\subsection{Mutación}
+La mutación se aplica al individuo resultante del cruce de dos padres con una probabilidad determinada. De nuevo, este será un hiperámetro a definir en la experimentación y cada hijo resultante de un cruce se selecciona para ser mutado de forma independiente con probabilidad $p_{mutacion}$.
+
+Una vez un individuo ha sido elegido para ser mutado, se hace lo siguiente:
+\begin{enumerate}
+    \item Seleccionar una pieza al azar del individuo.
+    \item Seleccionar un movimiento al azar dentro de esa pieza.
+    \item Mutar el movimiento seleccionado generando un nuevo 'valor aleatorio total' dentro del rango permitido para ese movimiento.
+\end{enumerate}
+
+Como ya se ha comentado anteriormente, para cada tipo de movimiento hay un rango permitido \ref{appendix:movimientos}. Se han planteado dos formas de elegir el nuevo valor del movimiento:
+\begin{itemize}
+    \item \textbf{Mutación aleatoria total}: generar un nuevo valor aleatorio dentro del rango permitido para ese movimiento.
+    \item \textbf{Mutación cercana}: generar un nuevo valor cercano al valor actual del movimiento.
+\end{itemize}
+
+Cuando se dice 'mutaciones cercanas', se hace referencia al hecho de NO variar el valor actuar en más de uno y solo elegir 'vecinos inmediatos'. Por ejemplo, si el movimiento es un desplazamiento lateral de 3, solo se mutaría a 2 o 4 en la versión cercana, pero en la aleatoria total se generaría un nuevo valor aleatorio entre -5 y 5 (en este caso).
+
+La razón de aplicar la estrategia de mutación aleatoria total, es aumentar la diversidad de la población y poder escapar de óptimos locales con mayor probabilidad. Se han probado ambos formatos y la generación de soluciones buenas se veía muy ralentizada al aplicar mutaciones cercanas. Es por ello que se ha optado por usar mutaciones aleatorias totales en la solución final.
+
+\subsection{Reemplazo}
+El reemplazo como ya se sabe consiste en decidir qué de la generación actual pasan a la siguiente y cuales son reemplazados. 
+
+Sin muchas sorpresas, se ha optado por un reemplazo generaciónal parcial, donde la mitad peor de individuos es totalmente reemplazada por aquellos creados mediante el cruce y la mutación.
+
+Ya que por cada cruce se generan dos hijos, se realizan $N/4$ cruces para generar $N/2$ nuevos individuos que reemplazan a la mitad peor de la población actual. 
+
+Cabe destacar que además, a la hora de evaluar las fitness de la nueva generación y ordenar los individuos, nos ahorramos la mitad de los cálculos al haber mantenido la mitad de la generación anterior. Esto es, solo se evalúan los $N/2$ nuevos individuos y se combinan con los $N/2$ individuos de la generación anterior, cuyos fitness ya se conocen.
+
+
+\section{Enfriamiento simulado}
+De forma similar a como se ha hecho en el apartado anterior, para el Enfriamiento simulado (Simulated Annealing, SA) \cite{} se ha implementado siguiendo los principios básicos de esta técnica de optimización. Siguiendo lo mencionado en la introducción a este apartado, se habla de como se llevan a cabo los pasos del algoritmo, en concreto: la definición de Vecindario, la lista Tabu, la Paciencia y el Enfriamiento de la temperatura.
+
+\subsection{Vecindario}
+Para el algoritmo del Enfriamiento simulado, se ha recordar que no se parte de una población inicial, sino de un único individuo inicial. Por lo tanto, es necesario definir cómo se generan soluciones vecinas a partir de un individuo actual. 
+
+Dada la naturaleza del problema y la codificación elegida, no hay otra forma de definir el vecindario que no sean aquellos indivuduos cuyos valores en el genotipo difieran en un único movimiento. Es decir, se generan soluciones vecinas mutando un único movimiento del individuo actual.
+
+La primera implementación de este vecindario se hizo usando la mutación cercana, es decir, generando un nuevo valor cercano al valor actual del movimiento. Sin embargo, tras varias pruebas se vio que este método no generaba soluciones vecinas suficientemente diversas, por lo que se optó por usar la mutación aleatoria total, generando un nuevo valor aleatorio dentro del rango permitido para ese movimiento.
+
+Con algo más de experimentación se vió que este método generaba buenas soluciones, pero parecía saltarse algunas posibles intermedias o se quedaba estancado sin saltar de individuo. Por ello, se ha terminado optando por generar una lista de todos los movimientos posibles para cada pieza (según el tipo de individuo) e iterar sobre todas ellas para generar soluciones vecinas de forma ordenada. Cuando todas las soluciones de una pieza han sido exploradas, se pasa a la siguiente pieza y se repite el proceso hasta haber explorado todas las piezas.
+
+La forma en la que se generan esta lista es simple y complejo a la vez. Ya que se saben todos los valores posibles para cada movimiento (ver Apéndice \ref{appendix:movimientos}), se pueden indexar en una lista los valores que puede tener cada movimiento. Por ejemplo, si estamos en \texttt{SwapSimple}, los posibles valores son 
+
+$$
+[0, 1, \quad -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, \quad 0, 1, 2, 3]
+$$
+
+Donde los primeros dos valores corresponden al movimiento de intercambio de pieza, los siguientes once al movimiento lateral inicial, y los últimos cuatro a la rotación inicial.
+
+Ya que estos $M$ movimientos son fijos, y se tienen $N$ piezas, se puede iterar de $0$ a $N\times M - 1$ con un índice $idx$ y calcular a qué pieza y movimiento corresponde dicho valor, intercambiarlo generando un nuevo individuo y evaluarlo. El cálculo es el siguiente:
+
+\begin{lstlisting}[language={[Sharp]C}, basicstyle=\ttfamily\small, frame=single, numbers=left, breaklines=true]
+// Create a neighbor by mutating the current best genotype
+int pieceIndex = idx % nPieces;
+int moveTypeIndex = (idx / nPieces) % allMovements.Length;
+int valueIndex = idx / (nPieces * allMovements.Length);
+
+// Ensure valueIndex is within bounds
+valueIndex = valueIndex % allMovements[moveTypeIndex].Length;
+\end{lstlisting}
+
+Con esto, cada vez que se itera sobre $idx$, se obtiene la pieza y el movimiento a mutar, junto con el nuevo valor a asignar. De esta forma, se exploran todas las soluciones vecinas de forma ordenada. Si al terminar de explorar todas las soluciones NO se ha encontrado una mejor solución, se reinicia el índice $idx$ a $0$ y se vuelve a empezar.
+
+También, mencionar que para añadir estocasticidad a la exploración no se empieza por $idx = 0$, sino que se genera un valor aleatorio entre $0$ y $N \times M - 1$ para empezar la exploración desde ahí. De esta forma, se evita explorar siempre las mismas soluciones en el mismo orden, lo que podría llevar a estancamientos.
+
+\subsection{Lista Tabu}
+
+
+\subsection{Paciencia y Enfriamiento de la temperatura}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                           EXPERIMENTACIÓN                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -425,13 +624,93 @@ La Implementación se ha realizado de la forma más optima posible, eliminando o
 %                                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% \APPENDIX
+\APPENDIX
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                        EJEMPLOS DE CADA TIPO DE FACTURA                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% \chapter{Apéndice ejemplo}
-% \label{appendix:ejemplos}
+\chapter{Tablas de movimientos}
+\label{appendix:movimientos}
+
+En este apéndice se incluyen las tablas completas que detallan los sets de movimientos posibles y los rangos de valores para cada tipo de movimiento. Estas tablas se presentan originalmente en el Capítulo 2 (Codificación), sección 2.2 (Movimientos posibles y tipos de genotipo).
+
+\section{Sets de movimientos}
+
+La Tabla \ref{tab:sets_movimientos_appendix} muestra los cuatro tipos de sets de movimientos que pueden usar los individuos en el algoritmo genético.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        \textbf{Tipo} & \textbf{Secuencia de movimientos} \\
+        \midrule
+        Simple & \begin{tabular}[t]{@{}l@{}}
+            1. Mover la pieza \\
+            2. Rotar la pieza
+        \end{tabular} \\
+        \midrule
+        Double & \begin{tabular}[t]{@{}l@{}}
+            1. Mover la pieza \\
+            2. Rotar la pieza \\
+            3. \textit{Dejar caer la pieza} \\
+            4. Mover la pieza \\
+            5. Rotar la pieza
+        \end{tabular} \\
+        \midrule
+        SwapSimple & \begin{tabular}[t]{@{}l@{}}
+            1. Intercambiar la pieza actual \\
+            2. Mover la pieza \\
+            3. Rotar la pieza
+        \end{tabular} \\
+        \midrule
+        SwapDouble & \begin{tabular}[t]{@{}l@{}}
+            1. Intercambiar la pieza actual \\
+            2. Mover la pieza \\
+            3. Rotar la pieza \\
+            4. \textit{Dejar caer la pieza} \\
+            5. Mover la pieza \\
+            6. Rotar la pieza
+        \end{tabular} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Sets de movimientos posibles para los individuos (ver Tabla \ref{tab:sets_movimientos} en el Capítulo 2).}
+    \label{tab:sets_movimientos_appendix}
+\end{table}
+
+\section{Rangos de valores}
+
+La Tabla \ref{tab:rangos_movimientos_appendix} detalla los rangos de valores permitidos para cada tipo de movimiento, incluyendo una descripción completa de su comportamiento.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lp{8cm}}
+        \toprule
+        \textbf{Movimiento} & \textbf{Rango y descripción} \\
+        \midrule
+        Intercambiar la pieza actual & $\{0, 1\}$ \\ 
+        & 0 si no se quiere intercambiar, 1 si se quiere intercambiar. \\
+        \midrule
+        Mover la pieza (inicial) & $\{-5, \dots, 5\}$ \\ 
+        & Un entero positivo o negativo. Si es positivo, se moverá esa cantidad de veces a la derecha; si es negativo, se moverá esa cantidad de veces a la izquierda (o hasta que no se pueda mover más). \\
+        \midrule
+        Rotar la pieza (inicial) & $\{0, 1, 2, 3\}$ \\ 
+        & Un entero entre 0 y 3, indicando cuántas veces se rotará la pieza en el sentido de las agujas del reloj. \\
+        \midrule
+        \textit{Dejar caer la pieza} & No configurable \\ 
+        & La pieza caerá hasta que toque el suelo o otra pieza. \\
+        \midrule
+        Mover la pieza (final) & $\{-9, \dots, 9\}$ \\ 
+        & Igual que el movimiento lateral inicial. \\
+        \midrule
+        Rotar la pieza (final) & $\{0, 1, 2, 3\}$ \\ 
+        & Igual que la rotación inicial. \\
+        \bottomrule
+    \end{tabular}
+    \caption{Rangos de valores permitidos para cada tipo de movimiento (ver Tabla \ref{tab:rangos_movimientos} en el Capítulo 2).}
+    \label{tab:rangos_movimientos_appendix}
+
+\end{table}
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
