@@ -275,8 +275,37 @@ Como optimización en este punto se ha propuesto lo siguiente: dado que las piez
     \label{tab:rangos_movimientos}
 \end{table}
 
-
 Por último, mencionar que cuando una pieza termine de ser movida se bloqueará al momento, dejándola caer hasta tocar el suelo u otra pieza y añadiéndola al tablero.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/movements_simple.png}
+        \caption{Movientos SwapSimple}
+        \label{fig:movements_simple}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/movements_double.png}
+        \caption{Movientos SwapDouble}
+        \label{fig:movements_double}
+    \end{subfigure}
+    
+    % \vspace{0.5cm}
+    
+    % \begin{subfigure}[b]{0.48\textwidth}
+    %     \centering
+    %     \includegraphics[width=\textwidth]{images/GA_np-30_movements.png}
+    %     \caption{30 piezas (Difícil)}
+    %     \label{fig:ga_np30_movements}
+    % \end{subfigure}
+    \caption{Esquema visual de movimientos posibles en genotipos SwapSimple y SwapDouble.}
+    \label{fig:pieces_movements}
+\end{figure}
+
+Aquí se pueden apreciar situaciones como en las de la derecha, donde la pieza azul de la izquierda puede aprovechar esos movimientos dobles para introducirse en la 'cueva' que crear la otra 'pseudo pieza'.
 
 \section{Talla del problema}
 En este trabajo se considerarán tres trallas del problema diferentes, con 10, 20 y 30 piezas siendo estás consideradas como fácil, media y difícil respectivamente.
@@ -345,6 +374,14 @@ Se han definido las siguientes heurísticas para evaluar la calidad del tablero 
     La idea tras esta métrica es penalizar tableros con muchos agujeros que no sean 'hoyos', ya que los hoyos son más fáciles de rellenar. Es también una métrica de dispersión de los agujeros en el tablero.
     \item \textbf{Hoyos más Profundo (Deepest Well)}: La profundidad de la columna más profunda de todas. Sería el mínimo del máximo (bloque más alto) de cada columna.
 \end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/heuristics.png}
+    \caption{Esquema visual de heuristicas: Rugosidad, Agujeros por columna, bloques, y bloques sobre agujeros.}
+    \label{fig:ga_evolution}
+\end{figure}
 
 La combinación de estas heurísticas, cada una con su respectivo factor de ponderación, conforma la puntuación final de la heurística, como se muestra en la siguiente fórmula:
 
