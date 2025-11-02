@@ -117,36 +117,13 @@
 
 
 \begin{abstract}[spanish]
+Este trabajo explora la resolución del juego de Tetris desde la perspectiva de la optimización, transformándolo en un problema de cobertura cuyo objetivo es minimizar el espacio ocupado por un conjunto predefinido de piezas. Para abordar este desafío combinatorio, se ha desarrollado una simulación de una versión moderna de Tetris y se han implementado dos algoritmos metaheurísticos: un Algoritmo Genético y un Enfriamiento Simulado.
 
-% \begin{lstlisting}[language=Python, basicstyle=\ttfamily\small, frame=single, numbers=left, breaklines=true]
-% def generate_prompt(df_train: pd.DataFrame, df_batch: pd.DataFrame, genres: str) -> str:
-%     prompt = f"""
-%     Classify the following movie in any of these genres. More than one genre can be assigned.
-%     Genres: {genres}
+La principal innovación de este enfoque radica en la codificación de las soluciones. En lugar de representar directamente las coordenadas finales de las piezas, cada posible solución se codifica como una secuencia de movimientos para cada una de las piezas disponibles. Este método garantiza la validez de todas las configuraciones generadas, ya que se obtienen a través de una simulación que respeta las reglas del juego. 
 
-%     ==============================================
-%     """
+El estado final del tablero, o fenotipo, se evalúa mediante una función de aptitud compuesta. Dicha función no solo considera la puntuación del juego (líneas completadas), sino que también integra un conjunto de heurísticas diseñadas para medir la calidad estructural del tablero, como la altura, el número de agujeros y la rugosidad, junto con una penalización por movimientos ineficientes, etc.
 
-%     for _, row in df_train.iterrows():
-%         prompt += f"Movie title: {row['movie_name']}\n"
-%         prompt += f"Plot: {row['description']}\n"
-%         prompt += f"Actual genres: {row['genre']}\n"
-%         prompt += "-------------------\n"
-
-%     prompt += """
-%     ==============================================
-%     Now, classify the following movies returning a structured JSON
-%     response with the movie names and their genres.
-%     """
-
-%     for _, row in df_batch.iterrows():
-%         prompt += f"Movie title: {row['movie_name']}\n"
-%         prompt += f"Plot: {row['description']}\n\n"
-
-%     return prompt
-% \end{lstlisting}
-
-
+A través de la optimización iterativa, los algoritmos buscan la secuencia de movimientos que conduce a la disposición más compacta de las piezas, demostrando la viabilidad de las técnicas metaheurísticas para resolver problemas complejos de planificación y optimización en entornos dinámicos y con restricciones como el Tetris, cuando una buena codificación para simular los individuos es implementada.
 \end{abstract}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -175,16 +152,19 @@
 %                                  INTRODUCCION                               %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introducción}
+El Tetris, uno de los videojuegos más icónicos y reconocibles de la historia, ha trascendido su condición de mero entretenimiento para convertirse en un fascinante campo de estudio en la inteligencia artificial y la optimización. A primera vista, el objetivo es simple: encajar una secuencia de piezas geométricas que caen, llamadas tetrominos, para formar líneas horizontales completas que, una vez llenas, desaparecen. Sin embargo, detrás de esta aparente sencillez se esconde un problema combinatorio de gran complejidad.
 
-\section{Problema a resolver}
-Minimización de la cobertura con restricciones. minimizar el espacio ocupado / la cantidad de bloques restantes en el tablero
+Este trabajo aborda el Tetris no como un juego en tiempo real, sino como un problema de optimización: dado un conjunto finito de piezas, ¿cuál es la disposición óptima de estas en el tablero para minimizar el espacio total ocupado? Este enfoque transforma el juego en un problema de cubrimiento, donde el objetivo es encontrar la configuración más densa posible que deje con menos bloques el tablero final. Decimos menos bloques, porque como condiciones del juego, al completar una línea esta se limpia, lo que puede reducir el espacio ocupado.
 
-Solución ideal de limpiar el tablero completo, solo se puede hacer con N piezas multiplos de 10 o 5 (4x10 )
+Esta condición puede simular un problema real donde tras apilar ciertos elementos de una forma concreta, se consigue que 'estén listos para su eliminado', añadiendo más realismo al problema de optimización planteado y por supuesto, más complejidad.
 
-\section{Dificultad del problema}
-Escala con el número de piezas. 10 es 'fácil', 20 'medio' y 30 'difícil'. Más no por limitaciones temporales y computacionales.
+Para resolver este problema, se exploran dos técnicas metaheurísticas: un Algoritmo Genético (GA) y un Enfriamiento Simulado (SA). La hipótesis de partida es que estos algoritmos, inspirados en la evolución natural y en procesos físicos de la materia, son capaces de navegar eficientemente por el espacio de soluciones para encontrar configuraciones de alta calidad.
 
-Talla del problema, con x piezas y tal movimientos x e y ^^
+Una de las claves de este proyecto reside en la codificación de las soluciones. En lugar de representar directamente las posiciones finales de las piezas, cada solución (o individuo) se codifica como una secuencia de movimientos para cada pieza. Este enfoque tiene una ventaja fundamental: garantiza que todas las soluciones generadas sean válidas según las reglas del juego, ya que se simula la colocación de cada pieza en el tablero siguiendo estos movimientos. El resultado de esta simulación, el estado final del tablero, constituye el fenotipo que será evaluado.
+
+La evaluación de la calidad de cada solución se realiza mediante una función de aptitud diseñada para ser maximizada. Esta función no solo considera la puntuación obtenida en la partida, sino que también incorpora una penalización por movimientos ineficientes, y un conjunto de heurísticas que miden la "calidad" del tablero resultante, codificando el objetivo de minimización de la cobertura.
+
+A lo largo de este documento, se detallará la codificación de los individuos, la formulación de la función objetivo y las heurísticas, para finalmente, analizar los resultados obtenidos por los algoritmos metaheurísticos en su tarea de resolver el problema de optimización planteado.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                         ANÁLISIS DEL PROBLEMA                               %
@@ -297,6 +277,32 @@ Como optimización en este punto se ha propuesto lo siguiente: dado que las piez
 
 
 Por último, mencionar que cuando una pieza termine de ser movida se bloqueará al momento, dejándola caer hasta tocar el suelo u otra pieza y añadiéndola al tablero.
+
+\section{Talla del problema}
+En este trabajo se considerarán tres trallas del problema diferentes, con 10, 20 y 30 piezas siendo estás consideradas como fácil, media y difícil respectivamente.
+
+Ahora, al definir los movimientos de la forma considerada, se ha de tener en cuenta la explosión combinatoria que se genera. Si se tiene un set de piezas de tamaño $N$ y cada pieza se tiene distintos movimientos $M_1, M_2, \ldots, M_k$ cada uno con su espacio, el espacio de búsqueda total $S$ se puede calcular como, el producto de todas las posibles combinaciones de movimientos para cada pieza, elevado al número de piezas:
+
+\begin{align*}
+S = (M_1 \times M_2 \times ... \times M_k)^N
+\end{align*}
+
+Por ejemplo, para ver el tamaño con un set de movimientos \texttt{Simple} y \texttt{SwapDouble} (2 y 5 movimientos posibles) y un set de piezas de tamaño 10, el espacio de búsqueda sería:
+\begin{align*}
+S_{Simple,10} &= (11 \times 4)^{10} = 44^{10} \approx 2.72 \times 10^{16} \\
+S_{SwapDouble,10} &= (2 \times 11 \times 4 \times 19 \times 4)^{10} = 6688^{10} \approx 1,79 \times 10^{38}
+\end{align*}
+
+Ahora, si hablamos de tallas más complejas, como un set de 30 pieazas, el espacio de búsqueda se vuelve inmanejable:
+\begin{align*}
+S_{Simple,30} &= (11 \times 4)^{30} = 44^{30} \approx 2.01 \times 10^{49} \\
+S_{SwapDouble,30} &= (2 \times 11 \times 4 \times 19 \times 4)^{30} = 6688^{30} \approx 5.94 \times 10^{114}
+\end{align*}
+
+Como referencia, el número estimado de átomos en el universo observable es aproximadamente $10^{80}$ \cite{}. Por lo tanto, incluso con un set de piezas relativamente pequeño, el espacio de búsqueda se vuelve inmanejable para una búsqueda exhaustiva. Esto justifica el uso de técnicas metaheurísticas como los Algoritmos Genéticos y el Enfriamiento Simulado para explorar eficientemente este vasto espacio de soluciones.
+
+También, cabe destacar que al usar este tipo de codificación, muchas de estas combinaciones resultarán en el mismo tablero final, ya que muchos movimientos pueden resultar en '\textit{no-op}' o movimientos que no cambian el estado final del tablero. Esto introduce redundancia en el espacio de búsqueda, pero sigue siendo preferible a generar soluciones inválidas.
+
 
 \section{Conversión genotipo a fenotipo}
 Como se ha mencionado, la idea es simular el juego a partir de los movimientos establecidos para cada pieza. De tal forma que un genotipo, representado por una secuencia de enteros (movimientos), se convierta en un fenotipo, aplicando cada jugada a la secuencia de piezas predeterminada, siendo que el estado final del tablero tras colocar todas las piezas será el fenotipo asociado.
