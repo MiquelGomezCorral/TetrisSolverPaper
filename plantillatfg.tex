@@ -195,7 +195,7 @@ Cuando se dice codificar los individuos como una secuencia de movimientos, es ne
     \item Intercambiar la pieza actual por la siguiente (o por una ya cambiada anteriormente)
 \end{itemize}
 
-En las versiones originales, cuando se dejaba caer una pieza y esta toca el suelo, se bloqueaba al instante. Sin embargo, en versiones más modernas esto no es así y aún habiendo tocado el suelo, se permite mover la pieza con unas ciertas reglas. En este caso, se hablaría hablando de un Tetris moderno como el Tetris 99 \cite{}, donde se permite que las piezas se muevan con más libertad y por tanto, se da más capacidad de representación al jugador. 
+En las versiones originales, cuando se dejaba caer una pieza y esta toca el suelo, se bloqueaba al instante. Sin embargo, en versiones más modernas esto no es así y aún habiendo tocado el suelo, se permite mover la pieza con unas ciertas reglas. En este caso, se hablaría hablando de un Tetris moderno como el Tetris 99 \cite{tetris99-tetriscompany-no-date}, donde se permite que las piezas se muevan con más libertad y por tanto, se da más capacidad de representación al jugador. 
 
 Es por todo esto que se ha elegido usar esta versión del juego y no la clásica para abordar el problema. El objetivo de esta decisión es dotar a los individuos de más capacidad de representación, lo que potencialmente debería permitir llegar a mejores soluciones.
 
@@ -299,7 +299,7 @@ S_{Simple,30} &= (11 \times 4)^{30} = 44^{30} \approx 2.01 \times 10^{49} \\
 S_{SwapDouble,30} &= (2 \times 11 \times 4 \times 19 \times 4)^{30} = 6688^{30} \approx 5.94 \times 10^{114}
 \end{align*}
 
-Como referencia, el número estimado de átomos en el universo observable es aproximadamente $10^{80}$ \cite{}. Por lo tanto, incluso con un set de piezas relativamente pequeño, el espacio de búsqueda se vuelve inmanejable para una búsqueda exhaustiva. Esto justifica el uso de técnicas metaheurísticas como los Algoritmos Genéticos y el Enfriamiento Simulado para explorar eficientemente este vasto espacio de soluciones.
+Como referencia, el número estimado de átomos en el universo observable es aproximadamente $10^{80}$ \cite{cuantosatomos-rol-2019}. Por lo tanto, incluso con un set de piezas relativamente pequeño, el espacio de búsqueda se vuelve inmanejable para una búsqueda exhaustiva. Esto justifica el uso de técnicas metaheurísticas como los Algoritmos Genéticos y el Enfriamiento Simulado para explorar eficientemente este vasto espacio de soluciones.
 
 También, cabe destacar que al usar este tipo de codificación, muchas de estas combinaciones resultarán en el mismo tablero final, ya que muchos movimientos pueden resultar en '\textit{no-op}' o movimientos que no cambian el estado final del tablero. Esto introduce redundancia en el espacio de búsqueda, pero sigue siendo preferible a generar soluciones inválidas.
 
@@ -322,7 +322,7 @@ Una vez se sabe como convertir un genotipo en fenotipo, es necesario definir una
 
 Esta función se pretende \textbf{MAXIMIZAR}. Desglosemos cada uno de los términos:
 \begin{itemize}
-    \item \textbf{Puntuación juego}: es la puntuación obtenida tras jugar la partida con el genotipo indicado. Esta puntuación se calcula como en el juego original, donde se otorgan puntos por cada línea completada, y se otorgan puntos extra por completar varias líneas a la vez (doble, triple, tetris) \cite{}. Se omiten puntos extra por combos o por dejar caer las piezas rápidamente, ya que no aportan nada a la calidad de la solución. También se omiten los \texttt{T-spins} \cite{}, de nuevo por no aportar nada a la calidad de la solución.
+    \item \textbf{Puntuación juego}: es la puntuación obtenida tras jugar la partida con el genotipo indicado. Esta puntuación se calcula como en el juego original, donde se otorgan puntos por cada línea completada, y se otorgan puntos extra por completar varias líneas a la vez (doble, triple, tetris) \cite{lineclear-harddropwiki-no-date}. Se omiten puntos extra por combos o por dejar caer las piezas rápidamente, ya que no aportan nada a la calidad de la solución. También se omiten los \texttt{T-spins} \cite{tspin-tetriswiki-no-date}, de nuevo por no aportar nada a la calidad de la solución.
     
     \item \textbf{Penalización}: es una penalización que se aplica en caso de que el genotipo contenga movimientos que no hagan nada o '\textit{no-op}' como se han definido anteriormente. La penalización será proporcional al número de movimientos inválidos realizados. Estas son calculadas durante la conversión de genotipo a fenotipo, en la simulación del juego.
     
@@ -330,7 +330,7 @@ Esta función se pretende \textbf{MAXIMIZAR}. Desglosemos cada uno de los térmi
 \end{itemize}
 
 \subsection{Heurísticas}
-Se han definido las siguientes heurísticas para evaluar la calidad del tablero final. El origen de todas ellas es una mezcla entre heurísticas clásicas usadas en la literatura para jugar al Tetris con IA \cite{}, videos de youtube \cite{} y experiencia personal. La idea principal tras estas, es codificar el objetivo de 'minimización' del espacio ocupado y guiar la búsqueda hacia soluciones buenas.
+Se han definido las siguientes heurísticas para evaluar la calidad del tablero final. El origen de todas ellas es una mezcla entre heurísticas clásicas usadas en la literatura para jugar al Tetris con IA \cite{tetrisgenetic-lewis-2015}, videos de youtube \cite{tetrisai-uci-2020} y experiencia personal. La idea principal tras estas, es codificar el objetivo de 'minimización' del espacio ocupado y guiar la búsqueda hacia soluciones buenas.
 
 \begin{itemize}
     \item \textbf{Bloques ocupados (Blocks)}: Suma absoluta de la cantidad de bloques ocupados que hay en el tablero. 
@@ -355,7 +355,7 @@ La combinación de estas heurísticas, cada una con su respectivo factor de pond
 Donde $H$ es el conjunto de todas las heurísticas mencionadas, $w_h$ es el factor de ponderación para la heurística $h$, y $\text{score}(h)$ es el valor calculado para dicha heurística en el tablero final. 
 
 \subsection{Pesos de la función objetivo}
-Los factores que ponderan cada uno de los términos de la función objetivo, se han establecido tras una serie de pruebas preliminares, referencias en la literatura \cite{} y 'a ojo'. Lo ideal sería poder lanzar una serie de experimentos para ajustar estos pesos, pero por limitaciones computacionales y de 'sentido' no ha sido posible.
+Los factores que ponderan cada uno de los términos de la función objetivo, se han establecido tras una serie de pruebas preliminares, referencias en la literatura \cite{tetrisgenetic-lewis-2015} y 'a ojo'. Lo ideal sería poder lanzar una serie de experimentos para ajustar estos pesos, pero por limitaciones computacionales y de 'sentido' no ha sido posible.
 
 Se dice 'sentido' porque alrededor de ajustar estos pesos, que al final no dejan de ser hiperparámetros, se podrían crear proyectos enteros. Un ejemplo sería usar técnicas metaheurísticas para ajustar estos pesos, como un algoritmo genético que optimice los pesos de las heurísticas, o incluso alguna técnica bayesiana más moderna.
 
@@ -419,7 +419,7 @@ En este capítulo se describen las tecnologías y herramientas usadas para imple
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Tecnología de Implementación}
-El desarrollo del proyecto se ha realizado mayoritariamente en C\#. Para lo que sería la parte visual se ha utilizado el framework Unity \cite{}, que permite crear aplicaciones gráficas de forma sencilla y rápida. También se ha usado Python para la visualización de resultados y generación de gráficos.
+El desarrollo del proyecto se ha realizado mayoritariamente en C\#. Para lo que sería la parte visual se ha utilizado el framework Unity \cite{unityplatform-unitytechnologies-no-date}, que permite crear aplicaciones gráficas de forma sencilla y rápida. También se ha usado Python para la visualización de resultados y generación de gráficos.
 
 La implementación del juego se ha hecho mediante C\# y Unity de forma que se han podido representar las soluciones de forma visual y dinámica. Unity permite crear escenas 2D y 3D de forma sencilla, y cuenta con una gran comunidad y documentación, por lo que para simular un juego como el Tetris, es una opción muy adecuada.
 
@@ -427,12 +427,12 @@ Respecto a la implementación de los algoritmos metaheurísticos, se ha optado p
 
 Los resultados de los experimentos se han almacenado en logs, de forma que se puedan analizar posteriormente en Python. Estos logs contienen información relevante como la puntuación obtenida, el tiempo de ejecución, los parámetros usados, etc.
 
-Por último, para la visualización de estos resultados, su análisis y generación de gráficos, se ha usado Python con librerías como Matplotlib \cite{} y Plotly \cite{}. Estas librerías permiten crear gráficos de forma sencilla y personalizable, lo que facilita la presentación de los resultados obtenidos en los experimentos.
+Por último, para la visualización de estos resultados, su análisis y generación de gráficos, se ha usado Python con librerías como Matplotlib \cite{matplotlib-org-no-date} y Plotly \cite{plotlydata-plotly-no-date}. Estas librerías permiten crear gráficos de forma sencilla y personalizable, lo que facilita la presentación de los resultados obtenidos en los experimentos.
 
-La Implementación de todo el código se puede encontrar en el repositorio de GitHub \cite{}.
+La Implementación de todo el código se puede encontrar en el repositorio de GitHub \cite{tetrissolver-miquelgomezcorral-no-date}.
 
 \section{Implementación del Tetris}
-Como ya se ha mencionado, la versión del Tetris utilizada es una versión moderna. Para tener control absoluto del juego y su simulación, se ha implementado el juego desde cero usando la guía oficial para el desarrollo de juegos Tetris \cite{}.
+Como ya se ha mencionado, la versión del Tetris utilizada es una versión moderna. Para tener control absoluto del juego y su simulación, se ha implementado el juego desde cero usando la guía oficial para el desarrollo de juegos Tetris \cite{tetrisguideline-blueplanet-2009}.
 
 Para poder hacer la simulación del juego, se ha abstraído todo mediante clases y objetos que representan las piezas, el tablero y las reglas del juego. De esta forma, se puede simular el juego de forma independiente de la parte visual y la parte lógica de los algoritmo. 
 
@@ -456,7 +456,7 @@ Las decisiones finales sobre los algoritmos y el razonamiento de su elección se
 Además, ya que esta memoria tiene como principal objetivo el ser evaluada por el profesor responsable de la asignatura, no se entrará en detalles básicos sobre el funcionamiento de los algoritmos, sino que se explicarán la forma en la que ha implementado cada parte de ellos.
 
 \section{Algoritmo genético}
-El algoritmo genético (Genetic Algorithm, GA) \cite{} se ha implementado siguiendo los principios básicos de esta técnica de optimización. Siguiendo lo mencionado anteriormente, se habla de como se llevan a cabo los pasos del algoritmo, en concreto: de la Población inicial, el Cruce, la Mutación, la Selección y el Reemplazo.
+El algoritmo genético (Genetic Algorithm, GA) \cite{geneticalgorithm-alam-2020} se ha implementado siguiendo los principios básicos de esta técnica de optimización. Siguiendo lo mencionado anteriormente, se habla de como se llevan a cabo los pasos del algoritmo, en concreto: de la Población inicial, el Cruce, la Mutación, la Selección y el Reemplazo.
 
 \subsection{Población inicial}
 En esta sección se habla de los pasos a seguir para generar individuos nuevos. En las solución final propuesta, solo se generan nuevos individuos al inicio. Sin embargo, se ha experimentado incluyendo nuevos individuos en cada generación, pero los resultados no han sido concluyentes por falta de pruebas más exhaustivas. Es por ello que se ha optado por una población inicial fija que cambia únicamente vía cruce.
@@ -491,7 +491,7 @@ Para el método elitista se probaron varios tamaños de élite, pero a la larga 
 
 Por otro lado, el método de tarta parecía llegar a buenos resultados de forma consistente, por lo que se ha optado por usarlo en la solución final. En la selección por tarta, se seleccionan dos padres para el cruce de forma proporcional a su fitness. Es decir, cuanto mejor sea el fitness de un individuo, más probabilidad tendrá de ser seleccionado como padre.
 
-A todos los individuos se les asigna una probabilidad usando la función Softmax \cite{}. Esta función transforma los valores de fitness en probabilidades entre 0 y 1, de forma que la suma de todas las probabilidades sea 1. 
+A todos los individuos se les asigna una probabilidad usando la función Softmax \cite{softmax-wikipedia-2024}. Esta función transforma los valores de fitness en probabilidades entre 0 y 1, de forma que la suma de todas las probabilidades sea 1.
 
 Al inicio se ha optado por usar la Softmax 'pura', pero se ha visto que los individuos con mejor fitness acaparaban casi toda la probabilidad de ser seleccionados, por lo que se ha optado por escalar con la versión 'temperatura' de la Softmax. Esta versión introduce un parámetro de temperatura $T$ que controla la 'suavidad' de la distribución de probabilidades. A mayor $T$, más uniforme será la distribución (más exploración), y a menor $T$, más se acentuará la diferencia entre los individuos, seleccionando solo los mejores (más explotación).
 
@@ -570,7 +570,7 @@ Cabe destacar que además, a la hora de evaluar las fitness de la nueva generaci
 
 
 \section{Enfriamiento simulado}
-De forma similar a como se ha hecho en el apartado anterior, el Enfriamiento simulado (Simulated Annealing, SA) \cite{} se ha implementado siguiendo los principios básicos de esta técnica de optimización. 
+De forma similar a como se ha hecho en el apartado anterior, el Enfriamiento simulado (Simulated Annealing, SA) \cite{simulatedannealing-henderson-2006} se ha implementado siguiendo los principios básicos de esta técnica de optimización. 
 
 Siguiendo lo mencionado en la introducción a este apartado, se habla de como se llevan a cabo los pasos del algoritmo, en concreto: la definición de Vecindario, la lista Tabu, la Paciencia y el Enfriamiento de la temperatura.
 
