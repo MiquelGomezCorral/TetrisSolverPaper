@@ -179,8 +179,12 @@
 \section{Problema a resolver}
 Minimización de la cobertura con restricciones 
 
+Solución ideal de limpiar el tablero completo, solo se puede hacer con N piezas multiplos de 10 o 5 (4x10 )
+
 \section{Dificultad del problema}
 Escala con el número de piezas. 10 es 'fácil', 20 'medio' y 30 'difícil'. Más no por limitaciones temporales y computacionales.
+
+Talla del problema, con x piezas y tal movimientos x e y ^^
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                         ANÁLISIS DEL PROBLEMA                               %
@@ -199,7 +203,7 @@ Al codificar los genotipos de esta forma, los individuos resultantes serán siem
 También, habrá movimientos que resulten en '\textit{no-op}', como intentar mover una pieza a la izquierda cuando ya está en el borde izquierdo del tablero. Más abajo vemos como se gestionan estos casos con la función objetivo.
 
 \section{Movimientos posibles y tipos de genotipo}
-Cuando decimos codificar los individuos como una secuencia de movimientos, es necesario definir cuales son estos. Si nos fijamos en el juego original, los movimientos posibles que puede hacer un jugador son:
+Cuando se dice codificar los individuos como una secuencia de movimientos, es necesario definir cuales son estos. Si se fija en el juego original, los movimientos posibles que puede hacer un jugador son:
 
 \begin{itemize}
     \item Mover la pieza a la izquierda.
@@ -213,11 +217,11 @@ Cuando decimos codificar los individuos como una secuencia de movimientos, es ne
 
 En las versiones originales, cuando se dejaba caer una pieza y esta toca el suelo, se bloqueaba al instante. Sin embargo, en versiones más modernas esto no es así y aún habiendo tocado el suelo, se permite mover la pieza con unas ciertas reglas. En este caso, se hablaría hablando de un Tetris moderno como el Tetris 99 \cite{}, donde se permite que las piezas se muevan con más libertad y por tanto, se da más capacidad de representación al jugador. 
 
-Es por todo esto que se ha elegido usar esta versión del juego y no la clásica para abordar el problema. El objetivo de esta decisión es dotar a los individuos de más capacidad de representación, lo que potencialmente debería permitirnos llegar a mejores soluciones.
+Es por todo esto que se ha elegido usar esta versión del juego y no la clásica para abordar el problema. El objetivo de esta decisión es dotar a los individuos de más capacidad de representación, lo que potencialmente debería permitir llegar a mejores soluciones.
 
 Ahora, si se tiene algo de experiencia en el juego, se puede ver que no en todas las situaciones, todos los movimientos son necesarios para llegar a una solución concreta. Sin ir más lejos, en casos donde el tablero está casi vacío y no hay piezas creando agujeros, siempre se podrá poner una pieza en cualquiera de las posiciones validas con una \textit{rotación} y un \textit{movimiento lateral}.
 
-Como tampoco queremos eliminar de la experimentación, la posibilidad de ver los efectos que tiene el sí hacer más movimientos una vez las piezas han tocado el suelo, se han planteado cuatro sets posibles de movimientos que podrán usar los individuos:
+Como tampoco se quiere eliminar de la experimentación, la posibilidad de ver los efectos que tiene el sí hacer más movimientos una vez las piezas han tocado el suelo, se han planteado cuatro sets posibles de movimientos que podrán usar los individuos:
 
 \begin{table}[H]
     \centering
@@ -295,14 +299,14 @@ Como optimización en este punto se ha propuesto lo siguiente: dado que las piez
 Por último, mencionar que cuando una pieza termine de ser movida se bloqueará al momento, dejándola caer hasta tocar el suelo u otra pieza y añadiéndola al tablero.
 
 \section{Conversión genotipo a fenotipo}
-Como hemos mencionado, la idea es simular el juego a partir de los movimientos establecidos para cada pieza. De tal forma que un genotipo, representado por una secuencia de enteros (movimientos), se convierta en un fenotipo, aplicando cada jugada a la secuencia de piezas predeterminada, siendo que el estado final del tablero tras colocar todas las piezas será el fenotipo asociado.
+Como se ha mencionado, la idea es simular el juego a partir de los movimientos establecidos para cada pieza. De tal forma que un genotipo, representado por una secuencia de enteros (movimientos), se convierta en un fenotipo, aplicando cada jugada a la secuencia de piezas predeterminada, siendo que el estado final del tablero tras colocar todas las piezas será el fenotipo asociado.
 
 Antes de definir un genotipo, habrá que definir un set de piezas concreto y qué movimientos se pueden realizar con cada una de ellas. A estos sets o tipos se les ha llamado \texttt{Genotype}. Con ambos datos, se podrá simular el juego con los movimientos indicados en el genotipo y el tablero final será el fenotipo asociado.
 
 Este set de piezas será el mismo para todos los individuos, y se generará aleatoriamente al inicio de la ejecución del algoritmo. 
 
 \section{Función objetivo}
-Una vez sabemos como convertir un genotipo en fenotipo, es necesario definir una función objetivo que nos permita evaluar la calidad de cada solución. Dado que el objetivo es minimizar el espacio ocupado en el tablero, se ha definido la siguiente función objetivo:
+Una vez se sabe como convertir un genotipo en fenotipo, es necesario definir una función objetivo que permita evaluar la calidad de cada solución. Dado que el objetivo es minimizar el espacio ocupado en el tablero, se ha definido la siguiente función objetivo:
 
 \begin{align*}
 \text{Fitness(genotipo)} = f(g) &= \text{factor juego}\times\text{puntuación juego} \\
@@ -349,7 +353,7 @@ Los factores que ponderan cada uno de los términos de la función objetivo, se 
 
 Se dice 'sentido' porque alrededor de ajustar estos pesos, que al final no dejan de ser hiperparámetros, se podrían crear proyectos enteros. Un ejemplo sería usar técnicas metaheurísticas para ajustar estos pesos, como un algoritmo genético que optimice los pesos de las heurísticas, o incluso alguna técnica bayesiana más moderna.
 
-Es por todo esto que al final hemos decidido fijar unos pesos 'a mano' basándonos lo mencionado anteriormente. En concreto, se han elegido los siguientes pesos:
+Es por todo esto que al final se ha decidido fijar unos pesos 'a mano' basándonos lo mencionado anteriormente. En concreto, se han elegido los siguientes pesos:
 \begin{table}[H]
     \centering
     \begin{tabular}{lc}
@@ -388,14 +392,14 @@ A su vez, los pesos para cada una de las heurísticas individuales, que componen
     \label{tab:pesos_heuristicas}
 \end{table}
 
-Como vemos, gran parte de estos factores son negativos. El problema a solucionar es \textbf{minimización} del espacio ocupado, pero la función objetivo está planteada como \textbf{maximización}. La idea tras todo esto es que \textbf{estas heurísticas codifiquen el concepto de 'minimización del espacio'} y guíen la búsqueda de soluciones. Por lo tanto, se penaliza todo aquello que aleje al tablero de este ideal y se recompensa lo que lo acerque.
+Como se ve, gran parte de estos factores son negativos. El problema a solucionar es \textbf{minimización} del espacio ocupado, pero la función objetivo está planteada como \textbf{maximización}. La idea tras todo esto es que \textbf{estas heurísticas codifiquen el concepto de 'minimización del espacio'} y guíen la búsqueda de soluciones. Por lo tanto, se penaliza todo aquello que aleje al tablero de este ideal y se recompensa lo que lo acerque.
 
 \subsection{Notas}
 Comentar ciertos aspectos importantes a modo de resumen sobre la función objetivo:
 \begin{itemize}
     \item Como se ha mencionado, el problema consiste en la minimización del espacio ocupado. La función objetivo \textbf{codifica este concepto a través de las heurísticas}, que penalizan tableros con mucho espacio vacío, agujeros, rugosidad, etc.
     \item La puntuación del juego se incluye para incentivar la eliminación de líneas, que es un objetivo secundario pero relevante en el Tetris y puede ayudar a la búsqueda de soluciones óptimas, ya que al limpiar piezas, se libera espacio en el tablero.
-    \item La penalización por movimientos inválidos, se incluye para evitar individuos con movimientos innecesarios. Ya que simulamos el juego, NO tenemos individuos inválidos, pero siempre preferimos un genotipo que use todos sus movimientos a aquel que no se intenta mover innecesariamente.
+    \item La penalización por movimientos inválidos, se incluye para evitar individuos con movimientos innecesarios. Ya que se simula el juego, NO se tienen individuos inválidos, pero siempre se prefiere un genotipo que use todos sus movimientos a aquel que no se intenta mover innecesariamente.
 \end{itemize}
 
     
@@ -453,7 +457,7 @@ En esta sección se habla de los pasos a seguir para generar individuos nuevos. 
 
 El número de individuos generados es un hiperámetro y se mantendrá constante durante toda la ejecución del algoritmo. A su vez, hay que definir el tipo de individuo a generar (el set de movimientos) junto con el número de piezas con las que se hará la optimización.
 
-Una vez definidos estos parámetros, se generan los $N$ individuos de forma independiente rellenando sus sets de movimientos. Vamos a indicar como se haría para el tipo de individuo \texttt{SwapDouble}, el resto de tipos son iguales pero con menos movimientos.
+Una vez definidos estos parámetros, se generan los $N$ individuos de forma independiente rellenando sus sets de movimientos. Se va a indicar como se haría para el tipo de individuo \texttt{SwapDouble}, el resto de tipos son iguales pero con menos movimientos.
 
 \begin{enumerate}
     \item Para cada individuo $i$ desde $1$ hasta $N$:
@@ -472,7 +476,7 @@ Una vez definidos estos parámetros, se generan los $N$ individuos de forma inde
     \item Devolver la población con los $N$ individuos generados
 \end{enumerate}
 
-Recordamos que cada movimiento está acotado a un rango concreto para evitar la mayor cantidad de movimiento inválidos posibles \ref{appendix:movimientos}. Aún así, como se ha mencionado en la sección de la función objetivo, se penalizan los \textit{no-op}s para evitar que los individuos generen movimientos innecesarios.
+Se recuerda que cada movimiento está acotado a un rango concreto para evitar la mayor cantidad de movimiento inválidos posibles \ref{appendix:movimientos}. Aún así, como se ha mencionado en la sección de la función objetivo, se penalizan los \textit{no-op}s para evitar que los individuos generen movimientos innecesarios.
 
 \subsection{Selección}
 Para la selección se ha optado por probar tanto el método elitista como el método de tarta con probabilidad. 
@@ -499,10 +503,10 @@ Se han probado distintas temperaturas iniciales, pero al final se ha optado por 
     \label{fig:temp_evolution}
 \end{figure}
 
-Como vemos en la gráfica, siempre usamos valores muy elevados de temperatura. A lo largo de la memoria se hará más incapié en este punto, pero la EXPLORACIÓN es lo que más ha beneficiado a la generación de buenas soluciones. En esa línea se seleccionan más parámetros en los siguientes puntos. 
+Como se ve en la gráfica, siempre se usan valores muy elevados de temperatura. A lo largo de la memoria se hará más incapié en este punto, pero la EXPLORACIÓN es lo que más ha beneficiado a la generación de buenas soluciones. En esa línea se seleccionan más parámetros en los siguientes puntos. 
 
 \subsection{Cruce}
-El cruce parte de poder usar la función de selección para elegir dos padres. Con ellos, se generan dos hijos usando el operador que mejores resultados nos ha dado. Este operador junta la mitad de las piezas de cada padre para generar un hijo. El proceso es el siguiente:
+El cruce parte de poder usar la función de selección para elegir dos padres. Con ellos, se generan dos hijos usando el operador que mejores resultados ha dado. Este operador junta la mitad de las piezas de cada padre para generar un hijo. El proceso es el siguiente:
 
 \begin{enumerate}
     \item Seleccionar dos padres $padre_1$ y $padre_2$ usando la función de selección.
@@ -692,7 +696,7 @@ Para cada tipo de dificultad: 10 piezas, 20 piezas y 30 piezas (Fácil, Medio y 
     \label{tab:parametros_ga}
 \end{table}
 
-En total, con estos parámetros, se han realizado $4 \times 3 \times 3 = 36$ experimentos para cada tipo de dificultad, por lo que en total han sido, SOLO para el algoritmo genético, $36 \times 4 = 144$ experimentos. 
+En total, con estos parámetros, se han realizado $4 \times 3 \times 3 = 36$ experimentos para cada tipo de dificultad, por lo que en total han sido, SOLO para el algoritmo genético, $36 \times 3 = 108$ experimentos.
 
 Cada experimento se ha ejecutado durante un máximo de $3000$ generaciones y con una paciencia de $400$ generaciones. En caso de no conseguir una mejor solución tras $400$ generaciones o en caso de superar las $3000$, se ha registrado el mejor individuo encontrado hasta el momento como solución final.
 
@@ -709,7 +713,7 @@ De forma similar a como se ha hecho en el apartado anterior, para el Enfriamient
         \midrule
         Tipo de individuo & Simple, Double, SwapSimple, SwapDouble \\
         Factor de enfriamiento & $0.00005$, $0.0005$, $0.005$, $0.05$ \\
-        Tamaño lista tabú & $5$, $10$, $20$ \\
+        Tamaño lista tabú & $100$, $1000$, $10000$, $50000$ \\
         \bottomrule
     \end{tabular}
     \caption{Parámetros probados para el enfriamiento simulado}
@@ -723,43 +727,213 @@ $$
 
 De esta forma, lo que nos aseguramos es de visitar todos los vecinos al menos una vez antes de considerar que el algoritmo está estancado y aumentar la temperatura.
 
-En total, con estos parámetros, se han realizado $4 \times 3 \times 3 = 36$ experimentos para cada tipo de dificultad, por lo que en total han sido, SOLO para el enfriamiento simulado, $36 \times 4 = 144$ experimentos.
+En total, con estos parámetros, se han realizado $4 \times 4 \times 4 = 64$ experimentos para cada tipo de dificultad, por lo que en total han sido, SOLO para el enfriamiento simulado, $64 \times 3 = 192$ experimentos.
 
-Cada experimento se ha ejecutado durante un máximo de $100\;000$ generaciones y con una paciencia de $10\;000$ generaciones. En caso de no conseguir una mejor solución tras $10\;000$ generaciones o en caso de superar las $100\;000$, se ha registrado el mejor individuo encontrado hasta el momento como solución final.
+Cada experimento se ha ejecutado durante un máximo de $100\;000$ iteraciones y con una paciencia de $10\;000$ iteraciones. En caso de no conseguir una mejor solución tras $10\;000$ iteraciones o en caso de superar las $100\;000$, se ha registrado el mejor individuo encontrado hasta el momento como solución final (que no el individuo actual).
 
-Durante cada iteración se ha registrado el mejor fitness de la generación actual, junto con la temperatura en ese momento. De esta forma, se puede analizar la evolución del algoritmo a lo largo del tiempo.
-
-\section{Duración experimentos}
-En total se han realizado $144 + 144 = 288$ experimentos, cada uno con distintas duraciones dependiendo de los parámetros usados.
-
-Todos los experimentos se han ejecutado en mi máquina personal. Las máquina tiene como procesador un CPU Ryzen 9 9000 con 64GB RAM, por lo que se puede considerar una capacidad de cómputo alta. Ahora, el tiempo de ejecución de cada experimento varía mucho dependiendo del tipo de algoritmo, el tipo de individuo y la cantidad de piezas a optimizar. 
-
-Por ejemplo, los experimentos del algoritmo genético con 10 piezas tardan entre $1$ y $15$ minutos en completarse, mientras que los experimentos con 20 y 30 piezas pueden tardar entre $10$ y $120$ minutos, variando también según la cantidad de individuos y si converge o no antes de llegar al límite de generaciones.
-
-Para el algoritmo de enfriamiento simulado, los tiempos son generalmente más cortos, oscilando entre $1$ y $10$ minutos para 10 piezas, y entre $5$ y $20$ minutos para 20 y 30 piezas. Esto se debe a la naturaleza más simple de los movimientos y la estructura del algoritmo en comparación con el algoritmo genético.
+Durante la ejecución, se ha registrado la fitness del individuo actual y la del mejor encontrado hasta el momento. Cuando se ha cambiado de individuo se registra su fitness (mejor o pero a la previa) y cuando esta mejora la mejor solución encontrada, se registra también. También, en cada actualización se ha registrado la temperatura en ese momento. Así, se puede analizar la evolución del algoritmo a lo largo del tiempo.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                               RESULTADOS DE LA SOLUCIón                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Resultado}
-En este apartado mostramos los resultados obtenidos tras la experimentación exhaustiva realizada. Se presentan comparaciones de como cada tipo de parámetro afecta a las soluciones finales (a su fitness). También se presentan los mejores resultados obtenidos para cada tipo de dificultad y se comparan los rendimientos de los dos algoritmos implementados.
+En este apartado se muestran los resultados obtenidos tras la experimentación exhaustiva realizada. Se presentan comparaciones de como cada tipo de parámetro afecta a las soluciones finales (a su fitness). También se presentan las mejores configuraciones encontradas para cada tipo de dificultad y se analizan las gráficas de evolución de los algoritmos.
 
-No mostraremos todas las gráficas obtenidas en este apartado, estas estarán en el anexo \ref{appendix:resultados_experimentacion} para aquellos interesados en verlas todas. Aquí se mostrarán las más relevantes y aquellas que ayuden a entender el comportamiento de los algoritmos.
+No se mostrarán todas las gráficas obtenidas en este apartado, estas estarán en el anexo \ref{appendix:resultados_experimentacion} para aquellos interesados en verlas todas. Aquí se mostrarán las más relevantes y aquellas que ayuden a entender el comportamiento de los algoritmos.
 
+Se mencionarán uno a uno los parámetros modificados y como afectan a los resultados finales.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Algoritmo genético}
+Para el algoritmo genético, se han probado los parámetros mencionados en la sección de Experimentación: Tipo de individuo, Tamaño de la población y Probabilidad de mutación. A continuación se analizan los resultados obtenidos al variar cada uno de estos parámetros.
+
+\subsection{Tamaño de la población}
+Al variar el tamaño de la población, se ve que a mayor tamaño, se conseguien buenas soluciones de forma más consitentes que con poblaciones pequeñas. Esto es algo bastante esperable y un comportamiento comúme en los algoritmos genéticos.
+
+La razón de esto es que, a mayor tamaño de población, hay una mayor diversidad genética entre los individuos. Esto permite explorar una mayor variedad de soluciones y evita que el algoritmo se quede estancado en óptimos locales.
+
+En el caso concreto de este trabajo, se ve que a partir de $20000$ individuos, las soluciones obtenidas suelen ser buenas, superando el umbral de aceptación de $-50$. Ahora, esto es solo para tallas medianas y pequeñas del problema. Para casos complejos como 30 piezas, el tamaño de la población parece afectar simple posibilidad de encontrar una solución aceptable.
+
+Si se ven los resultados con 30 piezas, por lo general solo con $30000$ individuos se consiguen soluciones aceptables, mientras que con $10000$ y $20000$ individuos, las soluciones suelen ser malas exceptuando algún caso.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/GA_np-30_population.png}
+    \caption{Comparación de fitness final para distintos tamaños de población con 30 piezas.}
+    \label{fig:ga_np30_population_big}
+\end{figure}
+
+Se puedo deducir que en caso de aplicar este método a problemas con más de 30 piezas, será necesario escalar de forma proporcional el tamaño de la población para conseguir soluciones aceptables. 
+
+\subsection{Probabilidad de mutación}
+Con respecto a la probabilidad de mutación, se ha visto que una probabilidad baja (5\%) no permite explorar suficiente el espacio de soluciones, quedando el algoritmo estancado en óptimos locales con frecuencia.
+
+Por otro lado, probabilidades más altas (25\%) no parecen tener ninguna ventaja clara sobre probabilidades medias (15\%). De hecho, en algunos casos, las probabilidades altas parecen dificultar la convergencia del algoritmo, ya que se generan demasiadas mutaciones y se pierde la coherencia entre generaciones.
+
+En la siguiente gráfica se aprecia la clara tendencia a generar peores soluciones con una probabilidad de mutación del 5\% en comparación con las otras dos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/GA_np-20_mutation.png}
+    \caption{Comparación de fitness final para distintas probabilidades de mutación con 20 piezas.}
+    \label{fig:ga_np20_mutation_big}
+\end{figure}
+
+Es por eso que una mutación entre 15\% y 25\% parece ser la mejor opción para este problema en concreto, siendo un compromiso en permitir que el algoritmo llegue a soluciones aceptables sin incrementar demasiado la aleatoriedad.
+
+
+\subsection{Tipo de individuo}
+En este apartado en donde se la mayor diferencia entre parametrizaciones. El tipo de individuo afecta de forma muy clara a la calidad de las soluciones obtenidas.
+
+Como se ha mencionado, los individuos que permiten más movimientos, son los que dan mayor capacidad de expresión a las soluciones y por lo tanto, permiten encontrar soluciones mejores.
+
+En este caso, lo que se ha visto es que contra mayor la complejidad del problema, más clara se ve esta diferencia. Siendo que con 10 piezas, los cuatro tipos de individuos consiguen soluciones aceptables (exceptuando en algunos casos el tipo \texttt{simple}), pero a medida que se aumenta la dificultad, es necesaria la introducción de los movimientos dobles.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-10_movements.png}
+        \caption{10 piezas (Fácil)}
+        \label{fig:ga_np10_movements_big}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/GA_np-30_movements.png}
+        \caption{30 piezas (Difícil)}
+        \label{fig:ga_np30_movements_big}
+    \end{subfigure}
+
+    \caption{Efecto del tipo de individuo en el algoritmo genético para 10 y 30 piezas.}
+    \label{fig:ga_movements_big}
+\end{figure}
+
+En este caso, la introducción del \texttt{swap} parece tener efecto en los resultados pero es tan severo como la introducción del \texttt{double}. Siendo que ha sido el único tipo de movimientos que nos ha permitido encontrar soluciones decentes para este caso, la expresividad del \texttt{SwapDouble} es clave.
+
+Por lo tanto, se puede concluir que la elección del tipo de individuo es crucial para el rendimiento del algoritmo genético, especialmente en problemas de mayor complejidad.
 
 \section{Enfriamiento simulado}
+Al igual que en el apartado anterior, se han probado los parámetros mencionados en la sección de Experimentación: Tipo de individuo, Factor de enfriamiento y Tamaño de la lista tabú. 
+
+A continuación se analizarían los resultados obtenidos al variar cada uno de estos parámetros. Sin embargo, lo que se ha observado es que \textbf{ninguno de estos parámetros afecta de forma significativa a la calidad de las soluciones obtenidas}.
+
+El único parámetro que parece tener un efecto es el tipo de individuo, de nuevo demostrando que la expresividad del individuo es crucial para encontrar buenas soluciones. Aún así, la diferencia entre tipos de individuos no es tan clara como en el caso del algoritmo genético.
+
+\subsection{Tipo de individuo}
+Al variar el tipo de individuo, se observa que los individuos más complejos (\texttt{Double} y \texttt{SwapDouble}) son los únicos que llegan a soluciones aceptables por encima de $-50$ en fitness.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/SA_np-10_movements.png}
+    \caption{Comparación de fitness final para tipos de individuo con 10 piezas.}
+    \label{fig:sa_np10_mutation_big}
+\end{figure}
+
+Ahora, esto solo sucede con tallas pequeñas del problema, ya que si nos vamos a casos como las 30 piezas, ningún tipo de individuo consigue soluciones aceptables. El único caso en el que se ha observado posibilidad de convergencia hacía soluciones aceptables, ha sido con el tipo \texttt{SwapDouble}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/SA_np-30_movements.png}
+    \caption{Comparación de fitness final para distintos tipos de individuo con 30 piezas.}
+    \label{fig:sa_np30_mutation_big}
+\end{figure}
+
+La razón por la que pueda estar pasando esto, es por la naturaleza del problema. Al modificar una pieza, todas las piezas posteriores se ven afectadas, por lo que el espacio de soluciones es muy complejo y lleno de valles profundos. 
+
+Enfriamiento simulado, parte de modificar la solución actual valor a valor. Esto quiere decir que unicamente se modifica una pieza a la vez, lo que puede dificultar el posicionamiento correcto de varias piezas consecutivas.
+
+Esta \textbf{dependencia entre las primeras piezas y las últimas} complica enormemente la exploración del espacio de soluciones, ya que al modificar una pieza, todas las posteriores se ven afectadas y es difícil encontrar un camino claro hacía soluciones buenas.
+
+Analicemos la evolución de ambos algoritmos para ver este comportamiento, pero como se puede intuir, el enfriamiento simulado no parece ser el algoritmo más adecuado para este problema.
 
 \section{Evolución}
+A continuación se muestra la evolución de las mejores soluciones obtenidas por ambos algoritmos a lo largo de sus ejecuciones para cada tipo de dificultad. Se muestran las gráficas de fitness a lo largo de las generaciones / iteraciones y se analizan los comportamientos observados.
 
+\subsection{Algoritmo genético}
+A continuación se muestra la figura con la evolución de varios ejemplos del algoritmo genético para 10, 20 y 30 piezas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/GA_evolution.png}
+    \caption{Evolución del mejor fitness en el algoritmo genético para 10, 20 y 30 piezas.}
+    \label{fig:ga_evolution_full}
+\end{figure}
+
+Lo que se puede observar es el comportamiento típico de un algoritmo genético. En las primeras generaciones, se observa una mejora rápida en la fitness, ya que la diversidad genética es alta y se exploran muchas soluciones diferentes.
+
+A medida que avanzan las generaciones, la tasa de mejora disminuye, ya que la población comienza a converger hacia soluciones similares. Sin embargo, gracias a la mutación y al cruce, el algoritmo sigue explorando nuevas soluciones y puede escapar de óptimos locales.
+
+Como detalle que se discute en la siguiente sección de duración de los experimentos, se observa que en problemas de talla pequeña la convergencia es inmediata, durando poco más de 400 iteraciones (por la paciencia). Sin embargo, en problemas más complejos, la convergencia es notoriamente más lenta y puede llegar a durar las 3000 generaciones completas. 
+
+Vemos que la mayoría de estas ejecuciones no dejan de mejorar poco a poco hasta el final, lo que indica que el algoritmo sigue explorando y mejorando la solución a lo largo de toda la ejecución.
+
+\textbf{Mejor solución encontrada:} Si nos fijamos en la gráfica, veremos una ejecución de 10 piezas que consigue una solución por encima de $0$. Mencionar que esta ha sido la única ejecución que ha conseguido llegar al objetivo ideal del problema, limpiando todo el tablero sin dejar ningún bloque.
+
+Es un caso bastante exceptional, pero demuestra que el algoritmo genético es capaz de encontrar soluciones óptimas en problemas de talla pequeña.
+
+\subsection{Enfriamiento simulado}
+A continuación se muestra la figura con la evolución de varios ejemplos del enfriamiento simulado para 10, 20 y 30 piezas.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{images/SA_evolution.png}
+    \caption{Evolución del mejor fitness en el algoritmo de enfriamiento simulado para 10, 20 y 30 piezas.}
+    \label{fig:sa_evolution_full}
+\end{figure}
+
+Lo que se puede apreciar es un comportamiento similar al algoritmo genético en las primeras etapas de la ejecución. Se observa una mejora rápida en la fitness al inicio, para luego ralentizarse a medida que avanza la ejecución.
+
+Otros detalle importante a resaltar es la cantidad de saltos que ocurren con el fitness de la solución actual en tallas grandes del problema. Cuando planteamos 10 la convergencia es inmediata y no hay apenas saltos. Para 20 se ven picos pero nada que ver con lo que ocurre con 30 piezas. En estos casos, se observa como la solución actual salta constantemente entre diferentes valores de fitness, lo que indica que el algoritmo está explorando muchas soluciones diferentes e intenta no quedarse estancado.
+
+Poco a poco tiende a converger a valor, pero nunca parece alcanzar buenas soluciones. Más bien, se queda estancado en valores muy bajos de fitness, sin poder encontrar soluciones aceptables. De nuevo mostrando la poca viabilidad de este algoritmo para problemas de esta naturaleza.
+
+\section{Duración experimentos}
+En total se han realizado $108 + 192 = 300$ experimentos, cada uno con distintas duraciones dependiendo de los parámetros usados.
+
+Todos los experimentos se han ejecutado en mi máquina personal. La máquina tiene como procesador un CPU Ryzen 9 9000 con 64GB RAM, por lo que se puede considerar una capacidad de cómputo alta. Ahora, el tiempo de ejecución de cada experimento varía mucho dependiendo del tipo de algoritmo, el tipo de individuo y la cantidad de piezas a optimizar. 
+
+Por ejemplo, los experimentos del algoritmo genético con 10 piezas tardan entre $1$ y $15$ minutos en completarse, mientras que los experimentos con 20 y 30 piezas pueden tardar entre $10$ y $120$ minutos o incluso más, variando también según la cantidad de individuos y si converge o no antes de llegar al límite de generaciones.
+
+Para el algoritmo de enfriamiento simulado, los tiempos son generalmente más cortos, oscilando entre $1$ y $10$ minutos para 10 piezas, y entre $5$ y $20$ minutos para 20 y 30 piezas. Esto se debe a la naturaleza más simple de los movimientos y la estructura del algoritmo en comparación con el algoritmo genético. Aún así, no se han podido registrar datos consistentes a lo largo de estos experimentos debido a la variabilidad en los tiempos de ejecución.
+
+\subsection{Cuando usar técnicas metaheurísticas}
+Como se ha mencionado, cuando la talla del problema supera las 10 piezas, los tiempos de computo tienden a superar las decenas de minutos, llegando incluso a varias horas. Por limitaciones temporales se han cortado las ejecuciones a un máximo de 3000 generaciones para el algoritmo genético y 100.000 iteraciones para el enfriamiento simulado. En caso de haberlas dejado más tiempo, las ejecuciones podrían haber durado varias horas o incluso días.
+
+Ahora, esto es solo así para más de 10 piezas. Para problemas pequeños, como los de 5 o 10 piezas, se podrían usar técnicas exactas como A* para encontrar la solución óptima en tiempos razonables (segundos o minutos). A pesar de que la complejidad combinatoria es muy muy alta como se ha visto en la introducción, para problemas pequeños se pueden encontrar soluciones óptimas en tiempos razonables.
+
+Si hablamos de problemas medianos o grandes (más de 10 piezas), las técnicas exactas se vuelven inviable debido a los tiempos de cómputo. En estos casos, las técnicas metaheurísticas como las implementadas en este proyecto son la mejor opción para encontrar soluciones buenas en tiempos razonables. Destacando como ya se ha visto, el algoritmo genético.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                 CONCLUSIONES                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{Conclusiones}
+
+A lo largo de este trabajo, se ha abordado el problema de optimización de la colocación de piezas de Tetris utilizando dos técnicas metaheurísticas: un algoritmo genético y enfriamiento simulado. Tras una fase de implementación y una extensa experimentación, se han extraído varias conclusiones clave sobre la naturaleza del problema y la efectividad de los métodos propuestos.
+
+En primer lugar, se ha demostrado que la \textbf{capacidad de expresión de los individuos es un factor crucial} para el éxito de los algoritmos. Los resultados muestran de manera consistente que los genotipos más complejos, como \texttt{SwapDouble}, que permiten un mayor número de movimientos y la capacidad de intercambiar piezas, obtienen soluciones significativamente mejores, especialmente a medida que aumenta la complejidad del problema (el número de piezas). Esto sugiere que dotar a los individuos de una mayor flexibilidad para explorar configuraciones complejas es fundamental para encontrar soluciones de alta calidad.
+
+En segundo lugar, este problema se beneficia enormemente de la \textbf{exploración sobre la explotación}. En el algoritmo genético, se observó que una temperatura inicial alta en la selección por tarta y una probabilidad de mutación relativamente elevada (15-25\%) eran necesarias para evitar el estancamiento en óptimos locales. De manera similar, en el enfriamiento simulado, la exploración de vecinos mediante mutaciones aleatorias totales fue más efectiva que la exploración de vecinos cercanos. La alta dependencia entre la posición de una pieza y las siguientes crea un espacio de soluciones muy accidentado, con múltiples valles profundos, donde una estrategia puramente explotadora queda atrapada con facilidad.
+
+Comparando ambos algoritmos, el \textbf{algoritmo genético ha demostrado ser superior al enfriamiento simulado} para este problema. Mientras que el GA fue capaz de encontrar soluciones de alta calidad, e incluso la solución óptima en una ocasión para 10 piezas, el SA tuvo dificultades para converger hacia soluciones aceptables en problemas de mayor tamaño. Esto se debe probablemente a que el operador de cruce del GA permite combinar sub-soluciones prometedoras (secuencias de piezas bien colocadas), superando la limitación del SA, que solo modifica una pieza a la vez y lucha por coordinar cambios complejos que involucran múltiples piezas.
+
+Finalmente, es importante contextualizar el uso de estas técnicas. Para \textbf{tallas pequeñas del problema (e.g., 10 piezas o menos), es más recomendable el uso de algoritmos exactos como A*}, que pueden encontrar la solución óptima en un tiempo razonable. Sin embargo, a medida que la dimensionalidad del problema crece, estos métodos se vuelven computacionalmente inviables, y es en este escenario donde las metaheurísticas, y en especial el algoritmo genético, demuestran su valía al proporcionar soluciones de buena calidad en tiempos de ejecución asumibles.
+
+Como trabajo futuro, sería interesante explorar algoritmos híbridos que combinen la capacidad de exploración global del algoritmo genético con la búsqueda local del enfriamiento simulado. Otra línea prometedora sería la optimización de los pesos de la función objetivo mediante otra capa de metaheurísticas, permitiendo un ajuste más fino y adaptativo de la evaluación de las soluciones.
+
+
+\section{Trabajos futuro}
+Como primer paso a considerar, se hará una Implementación paralela del algoritmo genético. Dado que la evaluación de individuos es una operación independiente para cada uno, se puede paralelizar fácilmente esta parte del algoritmo para aprovechar múltiples núcleos de CPU y reducir significativamente el tiempo de ejecución.
+
+Luego, a nivel de evaluación, se podrían plantear más heurísticas y encontrar una ponderación óptima entre ellas. Actualmente, se usan nueve heurísticas con pesos fijos + una de penalización + otra por puntuación del juego, pero se podría explorar la optimización de estos pesos mediante técnicas como la optimización bayesiana o algoritmos genéticos adicionales.
+
+Otra linea de trabajo para mejorar el funcionamiento tanto del algoritmo genético como del enfriamiento simulado, sería la implementación de algoritmos híbridos. Por ejemplo, tras ciertas iteraciones, se podría escoger la mejor solución encontrada hasta el momento por el genética y optimizarse con enfriamiento simulado como un paso de refinamiento local. Luego, ese resultado encontrado se podría aplicar a los mejores individuos de la población del geneético para mejorar su calidad.
+
+Esto se podría hacer hasta incluso con varios individuos a la vez de forma paralela, y al terminal todos introducirse de nuevo en la población del genético. De esta forma, se combinaría la exploración global del genético con la búsqueda local del enfriamiento simulado, pudiendo mejorar los resultados obtenidos.
+
+Mencionar que se comenzó a desarrollar parte del código en esta línea. Sin embargo, por falta de tiempo no se pudo completar ni experimentar con ello. Aún así, es una línea de trabajo muy prometedora para mejorar los resultados obtenidos en este proyecto.
+
+También por supuesto, se podrían usar otras técnicas exactas como A* o métodos vorazes en lugar del enfriamiento simulado para el paso de optimización local. Esto podría mejorar aún más los resultados obtenidos, aunque también incrementaría el tiempo de cómputo necesario.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                             %
